@@ -14,10 +14,11 @@ const steps = [
   },
   {
     icon: <FaUserTie size={40} className="text-green-600" />,
-    title: "Get Your Coach",
+    title: "Personal Coach Matching",
     description:
-      "No need to search — our system instantly assigns a certified coach from your community for personalized training.",
-  },
+      "Get connected with a certified coach from your community instantly — tailored to your fitness goals and preferences.",
+}
+,
   {
     icon: <FaRunning size={40} className="text-orange-600" />,
     title: "Start Training",

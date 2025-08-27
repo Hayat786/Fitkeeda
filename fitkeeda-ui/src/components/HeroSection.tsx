@@ -7,7 +7,7 @@ import { FaDumbbell, FaUserPlus, FaBuilding } from "react-icons/fa";
 
 export default function HeroSection() {
   return (
-    <section className="relative w-full overflow-hidden pb-10 md:pb-0 min-h-screen">
+    <section className="relative w-full overflow-hidden pt-10 md:pt-2  md:pb-0 min-h-screen">
       {/* Background Image with fade in */}
       <motion.div
         initial={{ opacity: 0 }}
@@ -41,7 +41,7 @@ export default function HeroSection() {
         >
           {/* Logo */}
           <Image
-            src="/full_logo.png"
+            src="/landing-logo.png"
             alt="FitKeeda Logo"
             width={350}
             height={100}

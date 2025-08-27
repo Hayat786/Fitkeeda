@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { bebasNeue, sourceSans } from "@/fonts";
+import { sourceSans } from "@/fonts";
+import Image from "next/image";
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -16,11 +17,11 @@ export default function Navbar() {
         transition={{ duration: 0.8, ease: "easeOut" }}
         className="fixed top-0 left-0 w-full z-50 bg-black/40 backdrop-blur-md shadow-md"
       >
-        <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
-          {/* Brand Name */}
-          <h1 className={`text-3xl font-bold text-white ${bebasNeue.className}`}>
-            FitKeeda
-          </h1>
+        <div className="max-w-7xl mx-auto px-3 py-4 flex justify-between items-center">
+          {/* Logo */}
+          <div className="h-16 w-32 relative">
+            <Image src="/logo.png" alt="FitKeeda Logo" fill className="object-contain" />
+          </div>
 
           {/* Desktop Navigation */}
           <div
@@ -86,44 +87,12 @@ export default function Navbar() {
               >
                 ✕
               </button>
-              <nav
-                className={`flex flex-col gap-6 text-lg ${sourceSans.className}`}
-              >
-                <a
-                  href="/about"
-                  className="hover:text-gray-300 transition-colors"
-                  onClick={() => setIsOpen(false)}
-                >
-                  About
-                </a>
-                <a
-                  href="/resident"
-                  className="hover:text-gray-300 transition-colors"
-                  onClick={() => setIsOpen(false)}
-                >
-                  Book
-                </a>
-                <a
-                  href="/coach"
-                  className="hover:text-gray-300 transition-colors"
-                  onClick={() => setIsOpen(false)}
-                >
-                  Enrollment
-                </a>
-                <a
-                  href="/gallery"
-                  className="hover:text-gray-300 transition-colors"
-                  onClick={() => setIsOpen(false)}
-                >
-                  Gallery
-                </a>
-                <a
-                  href="/terms"
-                  className="hover:text-gray-300 transition-colors"
-                  onClick={() => setIsOpen(false)}
-                >
-                  Terms
-                </a>
+              <nav className={`flex flex-col gap-6 text-lg ${sourceSans.className}`}>
+                <a href="/about" className="hover:text-gray-300 transition-colors" onClick={() => setIsOpen(false)}>About</a>
+                <a href="/resident" className="hover:text-gray-300 transition-colors" onClick={() => setIsOpen(false)}>Book</a>
+                <a href="/coach" className="hover:text-gray-300 transition-colors" onClick={() => setIsOpen(false)}>Enrollment</a>
+                <a href="/gallery" className="hover:text-gray-300 transition-colors" onClick={() => setIsOpen(false)}>Gallery</a>
+                <a href="/terms" className="hover:text-gray-300 transition-colors" onClick={() => setIsOpen(false)}>Terms</a>
                 <a
                   href="/admin"
                   className="bg-blue-900 text-white px-4 py-2 rounded-lg hover:bg-blue-800 transition-colors shadow-md"
