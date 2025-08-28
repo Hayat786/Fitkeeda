@@ -30,7 +30,7 @@ export default function Navbar() {
             <a href="/about" className="hover:text-gray-300 transition-colors">
               About
             </a>
-            <a href="/resident" className="hover:text-gray-300 transition-colors">
+            <a href="/auth-resident" className="hover:text-gray-300 transition-colors">
               Book
             </a>
             <a href="/coach" className="hover:text-gray-300 transition-colors">
@@ -89,7 +89,7 @@ export default function Navbar() {
               </button>
               <nav className={`flex flex-col gap-6 text-lg ${sourceSans.className}`}>
                 <a href="/about" className="hover:text-gray-300 transition-colors" onClick={() => setIsOpen(false)}>About</a>
-                <a href="/resident" className="hover:text-gray-300 transition-colors" onClick={() => setIsOpen(false)}>Book</a>
+                <a href="/auth-resident" className="hover:text-gray-300 transition-colors" onClick={() => setIsOpen(false)}>Book</a>
                 <a href="/coach" className="hover:text-gray-300 transition-colors" onClick={() => setIsOpen(false)}>Enrollment</a>
                 <a href="/gallery" className="hover:text-gray-300 transition-colors" onClick={() => setIsOpen(false)}>Gallery</a>
                 <a href="/terms" className="hover:text-gray-300 transition-colors" onClick={() => setIsOpen(false)}>Terms</a>

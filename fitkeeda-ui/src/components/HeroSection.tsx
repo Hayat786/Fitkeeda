@@ -69,7 +69,7 @@ export default function HeroSection() {
           className="flex flex-col gap-4 w-full md:w-[320px] md:items-end"
         >
           {[
-            { label: "Book a Session", link: "/resident", icon: <FaDumbbell className="text-xl" /> },
+            { label: "Book a Session", link: "/auth-resident", icon: <FaDumbbell className="text-xl" /> },
             { label: "Enroll as Coach", link: "/coach", icon: <FaUserPlus className="text-xl" /> },
             { label: "Society Registration", link: "/society", icon: <FaBuilding className="text-xl" /> },
           ].map((btn, i) => (
