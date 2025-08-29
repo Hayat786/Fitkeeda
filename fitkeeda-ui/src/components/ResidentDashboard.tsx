@@ -1,10 +1,18 @@
 "use client";
 
 import { JSX, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { FaCalendarAlt, FaClipboardList, FaSwimmer, FaWallet, FaUserCircle, FaBell } from "react-icons/fa";
+import {
+  FaCalendarAlt,
+  FaClipboardList,
+  FaSwimmer,
+  FaWallet,
+  FaUserCircle,
+  FaBell,
+} from "react-icons/fa";
 import { barlow, bebasNeue, sourceSans } from "@/fonts";
-import {jwtDecode} from "jwt-decode";
+import { jwtDecode } from "jwt-decode";
 
 interface Resident {
   id: string;
@@ -13,25 +21,38 @@ interface Resident {
   societyName: string;
 }
 
+interface DecodedToken {
+  id: string;
+  phone: string;
+  fullName: string;
+  societyName: string;
+  iat?: number;
+  exp?: number;
+}
+
 interface Card {
   title: string;
   icon: JSX.Element;
   action: () => void;
   gradient: string;
-  caption: string; // new caption field
+  caption: string;
 }
 
 export default function ResidentDashboard() {
   const [resident, setResident] = useState<Resident | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
-  const [notifications, setNotifications] = useState<number>(5); // example
+  const [notifications] = useState<number>(5);
+  const router = useRouter();
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    if (!token) return setLoading(false);
+    if (!token) {
+      setLoading(false);
+      return;
+    }
 
     try {
-      const decoded: any = jwtDecode(token);
+      const decoded = jwtDecode<DecodedToken>(token);
       setResident({
         id: decoded.id,
         phone: decoded.phone,
@@ -53,63 +74,63 @@ export default function ResidentDashboard() {
     year: "numeric",
   });
 
-  const handleCardClick = (title: string) => alert(`Clicked on ${title}`);
-
   const stats = [
-    { label: 'Upcoming Bookings', value: 3, gradient: 'from-blue-400 to-indigo-600' },
-    { label: 'Active Plans', value: 2, gradient: 'from-purple-400 to-pink-500' },
-    { label: 'Payments Pending', value: '2500 Rs', gradient: 'from-red-400 to-pink-600' },
+    { label: "Upcoming Bookings", value: 3, gradient: "from-blue-400 to-indigo-600" },
+    { label: "Active Plans", value: 2, gradient: "from-purple-400 to-pink-500" },
+    { label: "Payments Pending", value: "2500 Rs", gradient: "from-red-400 to-pink-600" },
   ];
 
   const cards: Card[] = [
     {
       title: "Book a Plan",
       icon: <FaCalendarAlt size={28} />,
-      action: () => handleCardClick("Book a Plan"),
+      action: () => router.push("/residents/booking-form"),
       gradient: "from-blue-400 to-indigo-600",
-      caption: "Reserve your preferred subscription quickly"
+      caption: "Reserve your preferred subscription quickly",
     },
     {
       title: "My Plans",
       icon: <FaClipboardList size={28} />,
-      action: () => handleCardClick("My Plans"),
+      action: () => alert("Navigating to My Plans"),
       gradient: "from-purple-400 to-pink-500",
-      caption: "View all your active and past subscriptions"
+      caption: "View all your active and past subscriptions",
     },
     {
       title: "Available Plans",
       icon: <FaClipboardList size={28} />,
-      action: () => handleCardClick("Available Plans"),
+      action: () => alert("Navigating to Available Plans"),
       gradient: "from-teal-400 to-green-500",
-      caption: "See all monthly, quarterly, half-year, and yearly options"
+      caption: "See all monthly, quarterly, half-year, and yearly options",
     },
     {
       title: "Payments",
       icon: <FaWallet size={28} />,
-      action: () => handleCardClick("Payments"),
+      action: () => alert("Navigating to Payments"),
       gradient: "from-red-400 to-pink-600",
-      caption: "Check pending or completed payment logs"
+      caption: "Check pending or completed payment logs",
     },
     {
       title: "Amenities",
       icon: <FaSwimmer size={28} />,
-      action: () => handleCardClick("Amenities"),
+      action: () => alert("Navigating to Amenities"),
       gradient: "from-yellow-400 to-orange-500",
-      caption: "Explore all available amenities in your society"
+      caption: "Explore all available amenities in your society",
     },
     {
       title: "View Profile",
       icon: <FaUserCircle size={28} />,
-      action: () => handleCardClick("View Profile"),
+      action: () => alert("Navigating to View Profile"),
       gradient: "from-gray-400 to-gray-600",
-      caption: "Manage your personal details and contact info"
+      caption: "Manage your personal details and contact info",
     },
   ];
 
   if (loading) {
     return (
       <div className="flex items-center justify-center h-screen bg-gradient-to-r from-blue-50 to-purple-50 animate-pulse">
-        <p className={`text-2xl font-semibold text-gray-700 ${sourceSans.className}`}>Loading Dashboard...</p>
+        <p className={`text-2xl font-semibold text-gray-700 ${sourceSans.className}`}>
+          Loading Dashboard...
+        </p>
       </div>
     );
   }
@@ -132,16 +153,18 @@ export default function ResidentDashboard() {
           </p>
         </div>
         <div className="relative cursor-pointer">
-          <FaBell size={28} className="text-blue-600"/>
+          <FaBell size={28} className="text-blue-600" />
           {notifications > 0 && (
-            <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">{notifications}</span>
+            <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+              {notifications}
+            </span>
           )}
         </div>
       </motion.div>
 
       {/* Quick Stats */}
       <motion.div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
-        {stats.map(stat => (
+        {stats.map((stat) => (
           <motion.div
             key={stat.label}
             whileHover={{ scale: 1.05 }}
@@ -165,7 +188,9 @@ export default function ResidentDashboard() {
             onClick={card.action}
             className={`cursor-pointer rounded-xl p-6 flex flex-col items-start justify-start text-white bg-gradient-to-r ${card.gradient} shadow-lg`}
           >
-            <motion.div whileHover={{ rotate: 20 }} className="mb-4">{card.icon}</motion.div>
+            <motion.div whileHover={{ rotate: 20 }} className="mb-4">
+              {card.icon}
+            </motion.div>
             <h2 className={`text-2xl font-bold ${sourceSans.className}`}>{card.title}</h2>
             <motion.p
               className="text-sm mt-2 opacity-80"

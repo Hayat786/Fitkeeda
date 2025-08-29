@@ -9,20 +9,14 @@ const api = axios.create({
   },
 });
 
-// ✅ Auth APIs
+// ===================== Auth APIs =====================
 export const signup = (data: { fullName: string; phone: string; societyName: string; password: string }) =>
   api.post("/auth/signup", data);
 
 export const login = (data: { phone: string; password: string }) =>
   api.post("/auth/login", data);
 
-// ✅ Fetch logged-in resident
-export const getMe = (token: string) =>
-  api.get("/auth/me", {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-
-// ✅ Society APIs
+// ===================== Society APIs =====================
 export const getSocieties = () => api.get("/societies");
 
 export const getSocietyById = (id: string) => api.get(`/societies/${id}`);
@@ -34,5 +28,40 @@ export const updateSociety = (id: string, data: { name?: string; area?: string; 
   api.put(`/societies/${id}`, data);
 
 export const deleteSociety = (id: string) => api.delete(`/societies/${id}`);
+
+// ===================== Sessions APIs =====================
+export interface SessionData {
+  apartment: string;
+  sport: string;
+  slot: string;
+  assignedCoach?: string | null;
+}
+
+export const createSession = (data: SessionData) => api.post("/sessions", data);
+
+export const getAllSessions = () => api.get<SessionData[]>("/sessions");
+
+export const assignCoachToSession = (sessionId: string, coachId: string) =>
+  api.patch(`/sessions/${sessionId}/assign-coach`, { coachId });
+
+// ===================== Bookings APIs =====================
+export interface BookingData {
+  apartment: string;
+  name: string;
+  number: string;
+  sport?: string;
+  plan?: string;
+  slot?: string;
+  paymentStatus?: string; // optional for creation
+}
+
+export const createBooking = (data: BookingData) => api.post("/bookings", data);
+
+export const getAllBookings = () => api.get<BookingData[]>("/bookings");
+
+export const updateBooking = (id: string, data: Partial<BookingData>) =>
+  api.put(`/bookings/${id}`, data);
+
+export const deleteBooking = (id: string) => api.delete(`/bookings/${id}`);
 
 export default api;
