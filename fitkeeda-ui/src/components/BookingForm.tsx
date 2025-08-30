@@ -22,6 +22,7 @@ export default function BookingForm() {
   const [loading, setLoading] = useState<boolean>(true);
   
   const [formData, setFormData] = useState({
+    _id: "",
     apartment: "",
     name: "",
     number: "",
@@ -51,6 +52,7 @@ export default function BookingForm() {
       const decoded = jwtDecode<{ id: string;fullName: string; phone: string; societyName: string }>(token);
       
       setFormData({
+        _id: decoded.id,
         apartment: decoded.societyName || "",
         name: decoded.fullName || "",
         number: decoded.phone || "",

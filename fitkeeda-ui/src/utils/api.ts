@@ -46,6 +46,7 @@ export const assignCoachToSession = (sessionId: string, coachId: string) =>
 
 // ===================== Bookings APIs =====================
 export interface BookingData {
+  _id: string;
   apartment: string;
   name: string;
   number: string;
