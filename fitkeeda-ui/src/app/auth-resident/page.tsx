@@ -1,4 +1,4 @@
-import LoginSignup from "@/components/LoginSignup";
+import LoginSignup from "@/components/resident-ui/LoginSignup";
 
 
 

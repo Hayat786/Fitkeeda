@@ -29,12 +29,26 @@ export const updateSociety = (id: string, data: { name?: string; area?: string; 
 
 export const deleteSociety = (id: string) => api.delete(`/societies/${id}`);
 
+// ===================== Coaches APIs =====================
+export interface CoachData {
+  name: string;
+  email: string;
+  phone: string;
+  sessions?: string[]; // Optional since default is []
+}
+
+export const createCoach = (data: CoachData) => api.post("/coaches", data);
+
+export const getAllCoaches = () => api.get<CoachData[]>("/coaches");
+
+
 // ===================== Sessions APIs =====================
 export interface SessionData {
+  _id?:string,
   apartment: string;
   sport: string;
   slot: string;
-  assignedCoach?: string | null;
+  assignedCoach?: null | { _id: string; name: string; email: string };
 }
 
 export const createSession = (data: SessionData) => api.post("/sessions", data);
@@ -46,7 +60,7 @@ export const assignCoachToSession = (sessionId: string, coachId: string) =>
 
 // ===================== Bookings APIs =====================
 export interface BookingData {
-  _id: string;
+  _id?: string;
   apartment: string;
   name: string;
   number: string;

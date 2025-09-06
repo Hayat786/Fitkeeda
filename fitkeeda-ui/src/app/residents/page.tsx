@@ -1,6 +1,6 @@
 
 
-import ResidentDashboard from "@/components/ResidentDashboard";
+import ResidentDashboard from "@/components/resident-ui/ResidentDashboard";
 
 
 

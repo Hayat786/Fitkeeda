@@ -1,9 +1,9 @@
-import Navbar from "@/components/Navbar";
-import HeroSection from "@/components/HeroSection";
-import MissionSection from "@/components/MissionSection";
-import StatsSection from "@/components/StatsSection";
-import EnquiryForm from "@/components/EnquiryForm";
-import Footer from "@/components/Footer";
+import Navbar from "@/components/landing page/Navbar";
+import HeroSection from "@/components/landing page/HeroSection";
+import MissionSection from "@/components/landing page/MissionSection";
+import StatsSection from "@/components/landing page/StatsSection";
+import EnquiryForm from "@/components/landing page/EnquiryForm";
+import Footer from "@/components/landing page/Footer";
 
 export default function Home() {
   return (

@@ -1,5 +1,5 @@
 
-import CreateSessionPage from "@/components/createSessions";
+import CreateSessionPage from "@/components/admin-ui/createSessions";
 
 
 

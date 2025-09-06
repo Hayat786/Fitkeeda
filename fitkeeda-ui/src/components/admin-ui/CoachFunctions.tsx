@@ -20,11 +20,41 @@ export default function CoachFunctions() {
   const router = useRouter();
 
   const coachFunctions: FunctionCardProps[] = [
-    { title: "Assign Coaches", icon: <MdAssignment size={28} />, caption: "Assign coaches to upcoming sessions", gradient: "from-blue-400 to-indigo-600" },
-    { title: "Coach Schedule", icon: <FaRegCalendarCheck size={28} />, caption: "View full schedules of coaches", gradient: "from-green-400 to-teal-500" },
-    { title: "Attendance Data", icon: <FaClipboardList size={28} />, caption: "Track coaches attendance records", gradient: "from-yellow-400 to-orange-500" },
-    { title: "Coach Profiles", icon: <FaUsers size={28} />, caption: "Manage all coaches' details", gradient: "from-purple-400 to-pink-500" },
-    { title: "Payment Logs", icon: <MdPayment size={28} />, caption: "View coach payments", gradient: "from-red-400 to-pink-600" },
+    {
+      title: "Assign Coaches",
+      icon: <MdAssignment size={28} />,
+      caption: "Assign coaches to upcoming sessions",
+      gradient: "from-blue-400 to-indigo-600",
+      action: () => router.push("/admin/coaches/assign"), // ✅ Placeholder route
+    },
+    {
+      title: "Coach Schedule",
+      icon: <FaRegCalendarCheck size={28} />,
+      caption: "View full schedules of coaches",
+      gradient: "from-green-400 to-teal-500",
+      action: () => router.push("/admin/coaches/schedule"), // ✅ Placeholder route
+    },
+    {
+      title: "Attendance Data",
+      icon: <FaClipboardList size={28} />,
+      caption: "Track coaches attendance records",
+      gradient: "from-yellow-400 to-orange-500",
+      action: () => router.push("/admin/coaches/attendance"), // ✅ Placeholder route
+    },
+    {
+      title: "Coach Profiles",
+      icon: <FaUsers size={28} />,
+      caption: "Manage all coaches' details",
+      gradient: "from-purple-400 to-pink-500",
+      action: () => router.push("/admin/coaches/profiles"), // ✅ Placeholder route
+    },
+    {
+      title: "Payment Logs",
+      icon: <MdPayment size={28} />,
+      caption: "View coach payments",
+      gradient: "from-red-400 to-pink-600",
+      action: () => router.push("/admin/coaches/payments"), // ✅ Placeholder route
+    },
   ];
 
   return (
@@ -34,7 +64,7 @@ export default function CoachFunctions() {
       animate={{ opacity: 1 }}
       transition={{ duration: 0.8 }}
     >
-      {/* Header with back button and logo */}
+      {/* Header */}
       <div className="flex items-center mb-8 space-x-4">
         <button
           onClick={() => router.push("/admin")}

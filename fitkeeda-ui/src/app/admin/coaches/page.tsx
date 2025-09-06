@@ -1,4 +1,4 @@
-import CoachFunctions from "@/components/CoachFunctions";
+import CoachFunctions from "@/components/admin-ui/CoachFunctions";
 
 
 

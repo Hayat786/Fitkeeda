@@ -1,4 +1,4 @@
-import ResidentFunctions from "@/components/ResidentManagement";
+import ResidentFunctions from "@/components/admin-ui/ResidentManagement";
 
 
 

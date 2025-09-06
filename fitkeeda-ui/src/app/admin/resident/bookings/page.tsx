@@ -1,4 +1,4 @@
-import BookingsPage from "@/components/Bookings";
+import BookingsPage from "@/components/admin-ui/Bookings";
 
 
 
