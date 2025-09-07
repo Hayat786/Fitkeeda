@@ -31,6 +31,7 @@ export const deleteSociety = (id: string) => api.delete(`/societies/${id}`);
 
 // ===================== Coaches APIs =====================
 export interface CoachData {
+  _id?: string;
   name: string;
   email: string;
   phone: string;
@@ -44,7 +45,7 @@ export const getAllCoaches = () => api.get<CoachData[]>("/coaches");
 
 // ===================== Sessions APIs =====================
 export interface SessionData {
-  _id?:string,
+  _id?:string;
   apartment: string;
   sport: string;
   slot: string;

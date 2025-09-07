@@ -90,7 +90,7 @@ export default function AdminDashboard() {
       icon: <FaBookOpen size={28} />,
       caption: "Quickly register a new housing society",
       gradient: "from-indigo-400 to-blue-500",
-      action: () => router.push("#"),
+      action: () => router.push("/admin/societies/new"),
     },
   ];
 

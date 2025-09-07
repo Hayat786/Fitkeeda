@@ -3,22 +3,30 @@
 import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
-import { FaUser, FaEnvelope, FaPhone, FaArrowLeft, FaCheck } from "react-icons/fa";
+import { FaBuilding, FaMapMarkerAlt, FaArrowLeft, FaCheck, FaList } from "react-icons/fa";
 import Image from "next/image";
-import { createCoach, CoachData } from "@/utils/api";
+import { createSociety } from "@/utils/api";
 import { bebasNeue, barlow, sourceSans } from "@/fonts";
 
-export default function AddCoachForm() {
+interface SocietyFormData {
+  name: string;
+  area: string;
+  amenities: string[];
+}
+
+export default function AddSocieties() {
   const router = useRouter();
   const formRef = useRef<HTMLDivElement>(null);
 
   const [step, setStep] = useState<number>(1);
   const [loading, setLoading] = useState<boolean>(false);
-  const [formData, setFormData] = useState<CoachData>({
+  const [formData, setFormData] = useState<SocietyFormData>({
     name: "",
-    email: "",
-    phone: "",
+    area: "",
+    amenities: [],
   });
+
+  const [amenityInput, setAmenityInput] = useState("");
 
   useEffect(() => {
     if (formRef.current) {
@@ -30,17 +38,38 @@ export default function AddCoachForm() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const isStep1Valid = formData.name.trim() && formData.email.trim() && formData.phone.trim();
+  const handleAddAmenity = () => {
+    if (amenityInput.trim()) {
+      setFormData((prev) => ({
+        ...prev,
+        amenities: [...prev.amenities, amenityInput.trim()],
+      }));
+      setAmenityInput("");
+    }
+  };
+
+  const handleRemoveAmenity = (index: number) => {
+    setFormData((prev) => ({
+      ...prev,
+      amenities: prev.amenities.filter((_, i) => i !== index),
+    }));
+  };
+
+  const isStep1Valid = formData.name.trim() && formData.area.trim();
 
   const handleSubmit = async () => {
     try {
       setLoading(true);
-      await createCoach(formData);
-      alert("✅ Coach added successfully!");
-      router.push("/admin/coaches");
+      await createSociety({
+        name: formData.name,
+        area: formData.area,
+        amenities: formData.amenities,
+      });
+      alert("✅ Society added successfully!");
+      router.push("/admin");
     } catch (error) {
       console.error(error);
-      alert("❌ Failed to add coach");
+      alert("❌ Failed to add society");
     } finally {
       setLoading(false);
     }
@@ -65,10 +94,10 @@ export default function AddCoachForm() {
       >
         <Image src="/full_logo.png" alt="Logo" width={250} height={250} className="mx-auto" />
         <h1 className={`${bebasNeue.className} text-3xl lg:text-5xl text-black mt-4`}>
-          Add a New Coach
+          Add a New Society
         </h1>
         <p className={`${barlow.className} text-gray-700 text-base lg:text-xl mt-2`}>
-          Fill in coach details to add them to the system.
+          Fill in the details to add a new society to the system.
         </p>
         <button
           onClick={() => router.push("/admin")}
@@ -103,30 +132,74 @@ export default function AddCoachForm() {
         {step === 1 && (
           <>
             <h2 className={`${sourceSans.className} text-3xl font-bold text-gray-900 mb-4`}>
-              Coach Details
+              Society Details
             </h2>
-            <p className="text-gray-600 mb-6">Enter the coach's personal information.</p>
+            <p className="text-gray-600 mb-6">Enter the society information.</p>
             <div className="space-y-5">
-              {[
-                { name: "name", placeholder: "Full Name", icon: FaUser },
-                { name: "email", placeholder: "Email Address", icon: FaEnvelope },
-                { name: "phone", placeholder: "Phone Number", icon: FaPhone },
-              ].map((field, idx) => {
-                const Icon = field.icon;
-                return (
-                  <div key={idx} className="relative">
-                    <Icon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" />
-                    <input
-                      type="text"
-                      name={field.name}
-                      value={formData[field.name as keyof CoachData] || ""}
-                      onChange={handleChange}
-                      placeholder={field.placeholder}
-                      className="w-full p-3 pl-10 rounded-lg bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 border border-gray-300"
-                    />
-                  </div>
-                );
-              })}
+              {/* Name */}
+              <div className="relative">
+                <FaBuilding className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" />
+                <input
+                  type="text"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleChange}
+                  placeholder="Society Name"
+                  className="w-full p-3 pl-10 rounded-lg bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 border border-gray-300"
+                />
+              </div>
+              {/* Area */}
+              <div className="relative">
+                <FaMapMarkerAlt className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" />
+                <input
+                  type="text"
+                  name="area"
+                  value={formData.area}
+                  onChange={handleChange}
+                  placeholder="Area / Location"
+                  className="w-full p-3 pl-10 rounded-lg bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 border border-gray-300"
+                />
+              </div>
+              {/* Amenities Dynamic */}
+              <div>
+                <label className=" mb-2 font-semibold text-gray-700 flex items-center gap-2">
+                  <FaList /> Amenities
+                </label>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={amenityInput}
+                    onChange={(e) => setAmenityInput(e.target.value)}
+                    placeholder="Enter an amenity"
+                    className="w-full p-3 rounded-lg bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 border border-gray-300"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleAddAmenity}
+                    disabled={!amenityInput.trim()}
+                    className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600"
+                  >
+                    Add
+                  </button>
+                </div>
+                <ul className="mt-3 flex flex-wrap gap-2">
+                  {formData.amenities.map((a, index) => (
+                    <li
+                      key={index}
+                      className="bg-green-100 text-green-800 px-3 py-1 rounded-full flex items-center gap-2"
+                    >
+                      {a}
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveAmenity(index)}
+                        className="text-red-500 hover:text-red-700"
+                      >
+                        ×
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </div>
             </div>
             <button
               onClick={() => setStep(2)}
@@ -150,14 +223,16 @@ export default function AddCoachForm() {
             </h2>
             <p className="text-gray-600 mb-6">Please verify the details before submission.</p>
             <ul className="mb-6 space-y-4">
-              {Object.entries(formData).map(([key, value], idx) => (
-                <li
-                  key={idx}
-                  className="bg-white p-4 rounded-lg border border-green-300 shadow-sm text-gray-900"
-                >
-                  <strong className="capitalize">{key}:</strong> {value}
-                </li>
-              ))}
+              <li className="bg-white p-4 rounded-lg border border-green-300 shadow-sm text-gray-900">
+                <strong>Name:</strong> {formData.name}
+              </li>
+              <li className="bg-white p-4 rounded-lg border border-green-300 shadow-sm text-gray-900">
+                <strong>Area:</strong> {formData.area}
+              </li>
+              <li className="bg-white p-4 rounded-lg border border-green-300 shadow-sm text-gray-900">
+                <strong>Amenities:</strong>{" "}
+                {formData.amenities.length > 0 ? formData.amenities.join(", ") : "None"}
+              </li>
             </ul>
             <div className="flex justify-between mt-6">
               <button
