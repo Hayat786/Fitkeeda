@@ -35,17 +35,21 @@ export interface CoachData {
   name: string;
   email: string;
   phone: string;
+  location: string;
   sessions?: string[]; // Optional since default is []
+  sports?: string[];   // ✅ New field for sports specialization
 }
 
 export const createCoach = (data: CoachData) => api.post("/coaches", data);
 
 export const getAllCoaches = () => api.get<CoachData[]>("/coaches");
 
+export const updateCoach = (id: string, data: Partial<CoachData>) =>
+  api.put(`/coaches/${id}`, data); // ✅ Added update endpoint for coaches
 
 // ===================== Sessions APIs =====================
 export interface SessionData {
-  _id?:string;
+  _id?: string;
   apartment: string;
   sport: string;
   slot: string;

@@ -6,7 +6,14 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { getAllCoaches, CoachData } from "@/utils/api";
 import { bebasNeue, sourceSans } from "@/fonts";
-import { FaArrowLeft, FaEnvelope, FaPhone, FaUser } from "react-icons/fa";
+import {
+  FaArrowLeft,
+  FaEnvelope,
+  FaPhone,
+  FaUser,
+  FaMapMarkerAlt,
+  FaDumbbell,
+} from "react-icons/fa";
 
 export default function CoachesList() {
   const router = useRouter();
@@ -45,7 +52,8 @@ export default function CoachesList() {
     return (
       c.name?.toLowerCase().includes(q) ||
       c.email?.toLowerCase().includes(q) ||
-      c.phone?.toLowerCase().includes(q)
+      c.phone?.toLowerCase().includes(q) ||
+      c.location?.toLowerCase().includes(q)
     );
   });
 
@@ -69,10 +77,16 @@ export default function CoachesList() {
           <div className="flex items-center gap-3">
             <Image src="/logo.png" alt="Logo" width={56} height={56} />
             <div>
-              <h1 className={`text-2xl md:text-3xl font-bold text-gray-800 ${bebasNeue.className}`}>
+              <h1
+                className={`text-2xl md:text-3xl font-bold text-gray-800 ${bebasNeue.className}`}
+              >
                 Coaches
               </h1>
-              <p className={`text-sm text-gray-600 ${sourceSans.className}`}>All registered coaches</p>
+              <p
+                className={`text-sm text-gray-600 ${sourceSans.className}`}
+              >
+                All registered coaches
+              </p>
             </div>
           </div>
         </div>
@@ -83,7 +97,7 @@ export default function CoachesList() {
             aria-label="Search coaches"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search by name, email, or phone..."
+            placeholder="Search by name, email, phone, or location..."
             className="w-full p-3 rounded-lg bg-white text-gray-900 placeholder-gray-400 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500 shadow-sm"
           />
         </div>
@@ -92,11 +106,19 @@ export default function CoachesList() {
       {/* Loading / Empty */}
       {loading ? (
         <div className="flex items-center justify-center h-64">
-          <p className={`text-lg text-gray-700 ${sourceSans.className}`}>Loading coaches...</p>
+          <p className={`text-lg text-gray-700 ${sourceSans.className}`}>
+            Loading coaches...
+          </p>
         </div>
       ) : filtered.length === 0 ? (
         <div className="text-center mt-12">
-          <Image src="/empty-state.svg" alt="No coaches" width={180} height={180} className="mx-auto" />
+          <Image
+            src="/empty-state.svg"
+            alt="No coaches"
+            width={180}
+            height={180}
+            className="mx-auto"
+          />
           <p className="text-gray-600 mt-6">No coaches found.</p>
         </div>
       ) : (
@@ -111,38 +133,81 @@ export default function CoachesList() {
                 {/* avatar */}
                 <div
                   className="w-14 h-14 rounded-full flex items-center justify-center text-xl font-semibold"
-                  style={{ background: "linear-gradient(135deg,#EAF2FF,#EEF7F1)" }}
+                  style={{
+                    background: "linear-gradient(135deg,#EAF2FF,#EEF7F1)",
+                  }}
                 >
-                  <span className="text-gray-800">{initials(coach.name)}</span>
+                  <span className="text-gray-800">
+                    {initials(coach.name)}
+                  </span>
                 </div>
 
                 {/* info */}
                 <div className="flex-1">
                   <div className="flex items-center justify-between gap-2">
-                    <h2 className={`text-lg font-semibold text-gray-800 ${sourceSans.className}`}>{coach.name}</h2>
+                    <h2
+                      className={`text-lg font-semibold text-gray-800 ${sourceSans.className}`}
+                    >
+                      <FaUser className="inline text-gray-500 mr-2" />
+                      {coach.name}
+                    </h2>
                     <span className="text-sm text-gray-500">
-                      {coach.sessions ? `${coach.sessions.length} session${coach.sessions.length !== 1 ? "s" : ""}` : "0 sessions"}
+                      {coach.sessions
+                        ? `${coach.sessions.length} session${
+                            coach.sessions.length !== 1 ? "s" : ""
+                          }`
+                        : "0 sessions"}
                     </span>
                   </div>
 
-                  <div className="mt-3 space-y-2">
-                    <p className="text-sm text-gray-600 flex items-center gap-2">
-                      <FaEnvelope className="text-gray-400" /> {coach.email || <span className="text-gray-400 italic">Not provided</span>}
+                  {/* sports */}
+                  {coach.sports && coach.sports.length > 0 && (
+                    <p className="text-sm text-gray-600 flex items-center gap-2 mt-2">
+                      <FaDumbbell className="text-gray-400" />
+                      {coach.sports.join(", ")}
                     </p>
-                    <p className="text-sm text-gray-600 flex items-center gap-2">
-                      <FaPhone className="text-gray-400" /> {coach.phone || <span className="text-gray-400 italic">Not provided</span>}
-                    </p>
-                  </div>
+                  )}
+
+                  {/* email */}
+                  <p className="text-sm text-gray-600 flex items-center gap-2 mt-2">
+                    <FaEnvelope className="text-gray-400" />
+                    {coach.email || (
+                      <span className="text-gray-400 italic">
+                        Not provided
+                      </span>
+                    )}
+                  </p>
+
+                  {/* phone */}
+                  <p className="text-sm text-gray-600 flex items-center gap-2 mt-2">
+                    <FaPhone className="text-gray-400" />
+                    {coach.phone || (
+                      <span className="text-gray-400 italic">
+                        Not provided
+                      </span>
+                    )}
+                  </p>
+
+                  {/* location */}
+                  <p className="text-sm text-gray-600 flex items-center gap-2 mt-2">
+                    <FaMapMarkerAlt className="text-gray-400" />
+                    {coach.location || (
+                      <span className="text-gray-400 italic">
+                        Not provided
+                      </span>
+                    )}
+                  </p>
 
                   {/* actions */}
                   <div className="mt-4 flex items-center gap-3">
                     <button
-                      onClick={() => router.push(`/admin/coaches/schedule`)}
+                      onClick={() =>
+                        router.push(`/admin/coaches/schedule`)
+                      }
                       className="px-3 py-2 rounded-lg bg-green-500 text-white text-sm font-medium hover:bg-green-600 shadow-sm"
                     >
                       View Schedule
                     </button>
-                    
                   </div>
                 </div>
               </div>

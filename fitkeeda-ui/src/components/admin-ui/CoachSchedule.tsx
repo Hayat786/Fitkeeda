@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { getAllCoaches, getAllSessions, CoachData, SessionData } from "@/utils/api";
 import { bebasNeue, sourceSans } from "@/fonts";
-import { FaArrowLeft } from "react-icons/fa";
+import { FaArrowLeft, FaSearch, FaUser } from "react-icons/fa";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 
@@ -14,6 +14,7 @@ export default function AdminCoachSchedule() {
   const [sessions, setSessions] = useState<SessionData[]>([]);
   const [expandedCoach, setExpandedCoach] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     async function fetchData() {
@@ -31,6 +32,10 @@ export default function AdminCoachSchedule() {
     }
     fetchData();
   }, []);
+
+  const filteredCoaches = coaches.filter((coach) =>
+    coach.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   if (loading) {
     return (
@@ -50,25 +55,49 @@ export default function AdminCoachSchedule() {
       transition={{ duration: 0.8 }}
     >
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center md:space-x-4 mb-8">
-        <div className="flex items-center space-x-3 mb-4 md:mb-0">
-          <button
-            onClick={() => router.push("/admin")}
-            className="p-2 rounded-full bg-white shadow-md hover:bg-gray-100 transition"
-          >
-            <FaArrowLeft className="text-gray-700" />
-          </button>
-          <Image src="/logo.png" alt="Logo" width={60} height={60} />
-        </div>
-        <h1 className={`text-3xl md:text-4xl font-bold text-gray-800 ${bebasNeue.className}`}>
-          Coaches Schedule
-        </h1>
-      </div>
+<div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8 gap-4">
+  <div className="flex items-center gap-3">
+    <button
+      onClick={() => router.push("/admin")}
+      className="p-2 rounded-full bg-white shadow-md hover:bg-gray-100 transition"
+    >
+      <FaArrowLeft className="text-gray-700" />
+    </button>
+    <Image src="/logo.png" alt="Logo" width={60} height={60} />
+    <h1 className={`text-3xl md:text-4xl font-bold text-gray-800 ${bebasNeue.className}`}>
+      Coaches Schedule
+    </h1>
+  </div>
+
+  {/* Search Bar */}
+  <div className="w-full max-w-md mb-6">
+  <input
+    type="text"
+    placeholder="Search by name, sport, or location..."
+    value={searchQuery}
+    onChange={(e) => setSearchQuery(e.target.value)}
+    className="w-full px-4 py-2 rounded-lg border border-gray-300 
+               bg-white text-gray-800 placeholder-gray-500
+               focus:outline-none focus:ring-2 focus:ring-purple-500
+               shadow-sm"
+  />
+
+
+    {searchQuery && (
+      <button
+        onClick={() => setSearchQuery("")}
+        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+      >
+        ×
+      </button>
+    )}
+  </div>
+</div>
 
       {/* All Coaches Section */}
       <h2 className="text-2xl font-semibold mb-4 text-gray-800">All Coaches</h2>
       <div className="space-y-4">
-        {coaches.map((coach) => {
+        {filteredCoaches.map((coach) => {
           const sessionsForCoach = sessions.filter((s) => coach.sessions?.includes(s._id || ""));
           return (
             <div
@@ -81,9 +110,14 @@ export default function AdminCoachSchedule() {
                 }
                 className="w-full text-left p-4 flex justify-between items-center hover:bg-gray-100 rounded-xl"
               >
-                <span className={`text-lg font-semibold text-gray-800 ${sourceSans.className}`}>
-                  {coach.name}
-                </span>
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-gradient-to-br from-purple-500 to-pink-500 text-white rounded-full shadow-md">
+                    <FaUser />
+                  </div>
+                  <span className={`text-lg font-semibold text-gray-800 ${sourceSans.className}`}>
+                    {coach.name}
+                  </span>
+                </div>
                 <span className="text-gray-500">{expandedCoach === coach._id ? "▲" : "▼"}</span>
               </button>
 

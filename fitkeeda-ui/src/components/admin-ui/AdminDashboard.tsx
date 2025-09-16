@@ -76,7 +76,7 @@ export default function AdminDashboard() {
       icon: <FaBookOpen size={28} />,
       caption: "Manage registered societies and plans",
       gradient: "from-pink-400 to-red-500",
-      action: () => router.push("/admin/societies/sessions"),
+      action: () => router.push("/admin/societies"),
     },
     {
       title: "Add New Coach",

@@ -5,17 +5,13 @@ import { motion } from "framer-motion";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import {
-  FaClipboardList,
   FaCalendarAlt,
-  FaEnvelope,
-  FaUsers,
-  FaUserTie,
-  FaQuestionCircle,
-  FaMoneyCheckAlt,
+  FaPlusCircle,
   FaBookOpen,
+  FaQuestionCircle,
   FaArrowLeft,
 } from "react-icons/fa";
-import { barlow, sourceSans, bebasNeue } from "@/fonts";
+import { sourceSans, bebasNeue } from "@/fonts";
 
 interface FunctionCardProps {
   icon: JSX.Element;
@@ -25,54 +21,38 @@ interface FunctionCardProps {
   action?: () => void;
 }
 
-export default function ResidentFunctions() {
+export default function SocietyFunctions() {
   const router = useRouter();
 
-  const residentFunctions: FunctionCardProps[] = [
+  const societyFunctions: FunctionCardProps[] = [
     {
-      title: "Check Bookings",
-      icon: <FaClipboardList size={28} />,
-      caption: "View and manage customer bookings",
+      title: "Society Sessions",
+      icon: <FaCalendarAlt size={28} />,
+      caption: "View all sessions scheduled for societies",
       gradient: "from-blue-400 to-indigo-600",
-      action: () => router.push("/admin/resident/bookings"),
-    },
-    
-    {
-      title: "Send Notices",
-      icon: <FaEnvelope size={28} />,
-      caption: "Send important messages to customers",
-      gradient: "from-yellow-400 to-orange-500",
-      action: () => router.push("/send-notices-placeholder"),
+      action: () => router.push("/admin/societies/sessions"),
     },
     {
-      title: "Registered Customers",
-      icon: <FaUsers size={28} />,
-      caption: "View all customers with details",
+      title: "Add Session",
+      icon: <FaPlusCircle size={28} />,
+      caption: "Schedule a new session for any society",
+      gradient: "from-green-400 to-teal-500",
+      action: () => router.push("/admin/societies/add"),
+    },
+    {
+      title: "Registered Societies",
+      icon: <FaBookOpen size={28} />,
+      caption: "Browse and manage all registered societies",
       gradient: "from-purple-400 to-pink-500",
-      action: () => router.push("/registered-customers-placeholder"),
+      action: () => router.push("/admin/societies/all"),
     },
     {
-      title: "Prospective Clients",
-      icon: <FaUserTie size={28} />,
-      caption: "Track pending clients",
-      gradient: "from-gray-400 to-gray-600",
-      action: () => router.push("/prospective-clients-placeholder"),
-    },
-    {
-      title: "Customer Queries",
+      title: "Queries Received",
       icon: <FaQuestionCircle size={28} />,
-      caption: "Respond to all customer inquiries",
+      caption: "Review and respond to society queries",
       gradient: "from-red-400 to-pink-600",
-      action: () => router.push("/customer-queries-placeholder"),
+      action: () => router.push("/admin/society/queries"),
     },
-    {
-      title: "Payment Logs",
-      icon: <FaMoneyCheckAlt size={28} />,
-      caption: "View all transactions made by customers",
-      gradient: "from-indigo-400 to-blue-500",
-      action: () => router.push("/payment-logs-placeholder"),
-    },
-    
   ];
 
   return (
@@ -90,14 +70,23 @@ export default function ResidentFunctions() {
         >
           <FaArrowLeft className="text-gray-700" />
         </button>
-        <Image src="/logo.png" alt="Logo" width={60} height={60} className="rounded-full" />
-        <h1 className={`text-3xl font-bold text-gray-800 ${bebasNeue.className}`}>
-          Resident Management
+        <Image
+          src="/logo.png"
+          alt="Logo"
+          width={60}
+          height={60}
+          className="rounded-full"
+        />
+        <h1
+          className={`text-3xl font-bold text-gray-800 ${bebasNeue.className}`}
+        >
+          Society Management
         </h1>
       </div>
 
+      {/* Function Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {residentFunctions.map((card, index) => (
+        {societyFunctions.map((card, index) => (
           <FunctionCard key={index} {...card} index={index} />
         ))}
       </div>
@@ -109,13 +98,24 @@ interface FunctionCardWithIndexProps extends FunctionCardProps {
   index: number;
 }
 
-function FunctionCard({ icon, title, caption, gradient, action, index }: FunctionCardWithIndexProps) {
+function FunctionCard({
+  icon,
+  title,
+  caption,
+  gradient,
+  action,
+  index,
+}: FunctionCardWithIndexProps) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 30 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.1 * index, duration: 0.6 }}
-      whileHover={{ scale: 1.05, rotate: 1.5, boxShadow: "0 10px 20px rgba(0,0,0,0.15)" }}
+      whileHover={{
+        scale: 1.05,
+        rotate: 1.5,
+        boxShadow: "0 10px 20px rgba(0,0,0,0.15)",
+      }}
       onClick={action}
       className={`cursor-pointer rounded-xl p-6 flex flex-col items-start justify-start text-white bg-gradient-to-r ${gradient} shadow-lg`}
     >
