@@ -149,7 +149,7 @@ export default function AddCoachForm() {
               Coach Details
             </h2>
             <p className="text-gray-600 mb-6">
-              Enter the coach's personal information.
+              Enter the coach&apos;s personal information.
             </p>
 
             <div className="space-y-5">

@@ -77,50 +77,51 @@ export default function BookingsPage() {
 
       {/* Bookings Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {bookings.map((booking, index) => (
-          <motion.div
-            key={booking._id}
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 * index, duration: 0.6 }}
-            whileHover={{ scale: 1.05, rotate: 1.5, boxShadow: "0 10px 20px rgba(0,0,0,0.15)" }}
-            className="rounded-xl p-6 text-white bg-gradient-to-r from-blue-400 to-indigo-600 shadow-lg flex flex-col justify-between"
-          >
-            <div>
-              <h2 className={`text-2xl font-bold ${sourceSans.className}`}>{booking.name}</h2>
-              <p className={`text-sm mt-1 opacity-80 ${sourceSans.className}`}>Apartment: {booking.apartment}</p>
-              <p className={`text-sm mt-1 opacity-80 ${sourceSans.className}`}>Number: {booking.number}</p>
-              {booking.sport && <p className={`text-sm mt-1 opacity-80 ${sourceSans.className}`}>Sport: {booking.sport}</p>}
-              {booking.plan && <p className={`text-sm mt-1 opacity-80 ${sourceSans.className}`}>Plan: {booking.plan}</p>}
-              {booking.slot && <p className={`text-sm mt-1 opacity-80 ${sourceSans.className}`}>Slot: {booking.slot}</p>}
-              {booking.paymentStatus && (
-                <p
-                  className={`text-sm mt-2 font-semibold ${
-                    booking.paymentStatus === "pending" ? "text-yellow-300" : "text-green-300"
-                  } ${sourceSans.className}`}
-                >
-                  Payment: {booking.paymentStatus}
-                </p>
-              )}
-            </div>
+        {bookings.map((booking, index) => {
+  // Skip any bookings without _id just in case
+  if (!booking._id) return null;
 
-            {/* Actions */}
-            <div className="mt-4 flex space-x-4">
-              <button
-                onClick={() => handleEdit(booking._id)}
-                className="flex-1 px-4 py-2 rounded-lg bg-gradient-to-r from-green-400 to-teal-500 text-white font-semibold hover:from-green-500 hover:to-teal-600 transition shadow-md"
-              >
-                Edit
-              </button>
-              <button
-                onClick={() => handleDelete(booking._id)}
-                className="flex-1 px-4 py-2 rounded-lg bg-gradient-to-r from-red-500 to-pink-500 text-white font-semibold hover:from-red-600 hover:to-pink-600 transition shadow-md"
-              >
-                Delete
-              </button>
-            </div>
-          </motion.div>
-        ))}
+  return (
+    <motion.div
+      key={booking._id}
+      initial={{ opacity: 0, y: 30 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0.1 * index, duration: 0.6 }}
+      whileHover={{ scale: 1.05, rotate: 1.5, boxShadow: "0 10px 20px rgba(0,0,0,0.15)" }}
+      className="rounded-xl p-6 text-white bg-gradient-to-r from-blue-400 to-indigo-600 shadow-lg flex flex-col justify-between"
+    >
+      <div>
+        <h2 className={`text-2xl font-bold ${sourceSans.className}`}>{booking.name}</h2>
+        <p className={`text-sm mt-1 opacity-80 ${sourceSans.className}`}>Apartment: {booking.apartment}</p>
+        <p className={`text-sm mt-1 opacity-80 ${sourceSans.className}`}>Number: {booking.number}</p>
+        {booking.sport && <p className={`text-sm mt-1 opacity-80 ${sourceSans.className}`}>Sport: {booking.sport}</p>}
+        {booking.plan && <p className={`text-sm mt-1 opacity-80 ${sourceSans.className}`}>Plan: {booking.plan}</p>}
+        {booking.slot && <p className={`text-sm mt-1 opacity-80 ${sourceSans.className}`}>Slot: {booking.slot}</p>}
+        {booking.paymentStatus && (
+          <p className={`text-sm mt-2 font-semibold ${booking.paymentStatus === "pending" ? "text-yellow-300" : "text-green-300"} ${sourceSans.className}`}>
+            Payment: {booking.paymentStatus}
+          </p>
+        )}
+      </div>
+
+      <div className="mt-4 flex space-x-4">
+        <button
+          onClick={() => handleEdit(booking._id!)} // Non-null assertion
+          className="flex-1 px-4 py-2 rounded-lg bg-gradient-to-r from-green-400 to-teal-500 text-white font-semibold hover:from-green-500 hover:to-teal-600 transition shadow-md"
+        >
+          Edit
+        </button>
+        <button
+          onClick={() => handleDelete(booking._id!)} // Non-null assertion
+          className="flex-1 px-4 py-2 rounded-lg bg-gradient-to-r from-red-500 to-pink-500 text-white font-semibold hover:from-red-600 hover:to-pink-600 transition shadow-md"
+        >
+          Delete
+        </button>
+      </div>
+    </motion.div>
+  );
+})}
+
       </div>
     </motion.div>
   );

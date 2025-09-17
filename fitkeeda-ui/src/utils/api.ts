@@ -84,4 +84,45 @@ export const updateBooking = (id: string, data: Partial<BookingData>) =>
 
 export const deleteBooking = (id: string) => api.delete(`/bookings/${id}`);
 
+
+// ===================== Enquiry APIs =====================
+
+// 🔹 Types for stricter typing in frontend
+export interface BaseEnquiry {
+  _id?: string;
+  type: "coach" | "society";
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface CoachEnquiry extends BaseEnquiry {
+  type: "coach";
+  name: string;
+  phone?: string;
+  email?: string;
+  location?: string;
+  sportsSpecialized?: string[];
+}
+
+export interface SocietyEnquiry extends BaseEnquiry {
+  type: "society";
+  societyName: string;
+  phone?: string;
+  location?: string;
+  amenities?: string[];
+}
+
+export type Enquiry = CoachEnquiry | SocietyEnquiry;
+
+// 🔹 API calls
+export const createCoachEnquiry = (data: Omit<CoachEnquiry, "_id" | "createdAt" | "updatedAt">) =>
+  api.post<CoachEnquiry>("/enquiries", { ...data, type: "coach" });
+
+export const createSocietyEnquiry = (data: Omit<SocietyEnquiry, "_id" | "createdAt" | "updatedAt">) =>
+  api.post<SocietyEnquiry>("/enquiries", { ...data, type: "society" });
+
+export const getAllEnquiries = () => api.get<Enquiry[]>("/enquiries");
+
+
+
 export default api;
