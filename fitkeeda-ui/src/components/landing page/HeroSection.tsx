@@ -70,8 +70,8 @@ export default function HeroSection() {
         >
           {[
             { label: "Book a Session", link: "/auth-resident", icon: <FaDumbbell className="text-xl" /> },
-            { label: "Enroll as Coach", link: "/coach", icon: <FaUserPlus className="text-xl" /> },
-            { label: "Society Registration", link: "/society", icon: <FaBuilding className="text-xl" /> },
+            { label: "Enroll as Coach", link: "/enquiry/coach", icon: <FaUserPlus className="text-xl" /> },
+            { label: "Society Registration", link: "/enquiry/society", icon: <FaBuilding className="text-xl" /> },
           ].map((btn, i) => (
             <motion.a
               key={i}

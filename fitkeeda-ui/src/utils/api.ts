@@ -36,8 +36,8 @@ export interface CoachData {
   email: string;
   phone: string;
   location: string;
-  sessions?: string[]; // Optional since default is []
-  sports?: string[];   // ✅ New field for sports specialization
+  sessions?: string[]; // Optional
+  sports?: string[];   // ✅ specialization
 }
 
 export const createCoach = (data: CoachData) => api.post("/coaches", data);
@@ -45,7 +45,7 @@ export const createCoach = (data: CoachData) => api.post("/coaches", data);
 export const getAllCoaches = () => api.get<CoachData[]>("/coaches");
 
 export const updateCoach = (id: string, data: Partial<CoachData>) =>
-  api.put(`/coaches/${id}`, data); // ✅ Added update endpoint for coaches
+  api.put(`/coaches/${id}`, data);
 
 // ===================== Sessions APIs =====================
 export interface SessionData {
@@ -72,7 +72,7 @@ export interface BookingData {
   sport?: string;
   plan?: string;
   slot?: string;
-  paymentStatus?: string; // optional for creation
+  paymentStatus?: string;
 }
 
 export const createBooking = (data: BookingData) => api.post("/bookings", data);
@@ -84,10 +84,9 @@ export const updateBooking = (id: string, data: Partial<BookingData>) =>
 
 export const deleteBooking = (id: string) => api.delete(`/bookings/${id}`);
 
-
 // ===================== Enquiry APIs =====================
 
-// 🔹 Types for stricter typing in frontend
+// 🔹 Base
 export interface BaseEnquiry {
   _id?: string;
   type: "coach" | "society";
@@ -95,15 +94,17 @@ export interface BaseEnquiry {
   updatedAt?: string;
 }
 
+// 🔹 Coach Enquiry
 export interface CoachEnquiry extends BaseEnquiry {
   type: "coach";
   name: string;
   phone?: string;
   email?: string;
   location?: string;
-  sportsSpecialized?: string[];
+  sportsSpecialized: string[]; // ✅ always required for coach
 }
 
+// 🔹 Society Enquiry
 export interface SocietyEnquiry extends BaseEnquiry {
   type: "society";
   societyName: string;
@@ -112,17 +113,18 @@ export interface SocietyEnquiry extends BaseEnquiry {
   amenities?: string[];
 }
 
+// Union
 export type Enquiry = CoachEnquiry | SocietyEnquiry;
 
 // 🔹 API calls
-export const createCoachEnquiry = (data: Omit<CoachEnquiry, "_id" | "createdAt" | "updatedAt">) =>
-  api.post<CoachEnquiry>("/enquiries", { ...data, type: "coach" });
+export const createCoachEnquiry = (
+  data: Omit<CoachEnquiry, "_id" | "createdAt" | "updatedAt">
+) => api.post<CoachEnquiry>("/enquiries", { ...data, type: "coach" });
 
-export const createSocietyEnquiry = (data: Omit<SocietyEnquiry, "_id" | "createdAt" | "updatedAt">) =>
-  api.post<SocietyEnquiry>("/enquiries", { ...data, type: "society" });
+export const createSocietyEnquiry = (
+  data: Omit<SocietyEnquiry, "_id" | "createdAt" | "updatedAt">
+) => api.post<SocietyEnquiry>("/enquiries", { ...data, type: "society" });
 
 export const getAllEnquiries = () => api.get<Enquiry[]>("/enquiries");
-
-
 
 export default api;
