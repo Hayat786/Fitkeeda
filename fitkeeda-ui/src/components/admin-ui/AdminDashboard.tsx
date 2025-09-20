@@ -1,20 +1,13 @@
 "use client";
 
-import { JSX, useEffect, useState } from "react";
+import { useEffect, useState, JSX } from "react";
 import { motion } from "framer-motion";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
-import {
-  FaUsers,
-  FaClipboardList,
-  FaRegCalendarCheck,
-  FaBookOpen,
-  FaMoneyCheckAlt,
-  FaBell,
-  FaArrowLeft,
-} from "react-icons/fa";
+import { FaArrowLeft, FaBell, FaMailBulk, FaClipboardList, FaBookOpen } from "react-icons/fa";
 import { MdPeople } from "react-icons/md";
 import { barlow, bebasNeue, sourceSans } from "@/fonts";
+import Image from "next/image";
+import { getAllBookings, getAllSessions, getAllEnquiries } from "@/utils/api";
 
 interface NavCardProps {
   icon: JSX.Element;
@@ -25,9 +18,14 @@ interface NavCardProps {
 }
 
 export default function AdminDashboard() {
-  const [today, setToday] = useState("");
   const router = useRouter();
+  const [today, setToday] = useState("");
   const [notifications] = useState<number>(3);
+  const [stats, setStats] = useState({
+    bookingsToday: 0,
+    sessionsNeedingCoach: 0,
+    queriesReceived: 0,
+  });
 
   useEffect(() => {
     const date = new Date();
@@ -39,16 +37,57 @@ export default function AdminDashboard() {
         year: "numeric",
       })
     );
+
+    const fetchStats = async () => {
+      try {
+        const [bookingsRes, sessionsRes, enquiriesRes] = await Promise.all([
+          getAllBookings(),
+          getAllSessions(),
+          getAllEnquiries(),
+        ]);
+
+        const todayDate = date.toISOString().split("T")[0]; // YYYY-MM-DD
+
+        const bookingsToday = bookingsRes.data.filter(
+          (b: any) => b.createdAt?.split("T")[0] === todayDate
+        ).length;
+
+        const sessionsNeedingCoach = sessionsRes.data.filter(
+          (s: any) => !s.assignedCoach
+        ).length;
+
+        const queriesReceived = enquiriesRes.data.length;
+
+        setStats({ bookingsToday, sessionsNeedingCoach, queriesReceived });
+      } catch (err) {
+        console.error("Failed to fetch dashboard stats:", err);
+      }
+    };
+
+    fetchStats();
   }, []);
 
-  // Quick Stats
-  const stats = [
-    { label: "Bookings Today", value: "32", gradient: "from-blue-400 to-indigo-600", link: "/admin/resident/bookings" },
-    { label: "Sessions Needing Coach", value: "8", gradient: "from-green-400 to-teal-500", link: "#" },
-    { label: "Queries Received", value: "15", gradient: "from-purple-400 to-pink-500", link: "#" },
+  const dashboardStats = [
+    {
+      label: "Bookings Today",
+      value: stats.bookingsToday,
+      gradient: "from-blue-400 to-indigo-600",
+      link: "/admin/resident/bookings",
+    },
+    {
+      label: "Sessions Needing Coach",
+      value: stats.sessionsNeedingCoach,
+      gradient: "from-green-400 to-teal-500",
+      link: "/admin/coaches/assign",
+    },
+    {
+      label: "Queries Received",
+      value: stats.queriesReceived,
+      gradient: "from-purple-400 to-pink-500",
+      link: "/admin/enquiries",
+    },
   ];
 
-  // Navigation Cards
   const navCards: NavCardProps[] = [
     {
       title: "Customer Management",
@@ -65,18 +104,18 @@ export default function AdminDashboard() {
       action: () => router.push("/admin/coaches"),
     },
     {
-      title: "Payments",
-      icon: <FaMoneyCheckAlt size={28} />,
-      caption: "View all customer and coach transactions",
-      gradient: "from-yellow-400 to-orange-500",
-      action: () => router.push("#"),
-    },
-    {
       title: "Societies",
       icon: <FaBookOpen size={28} />,
       caption: "Manage registered societies and plans",
       gradient: "from-pink-400 to-red-500",
       action: () => router.push("/admin/societies"),
+    },
+    {
+      title: "Queries",
+      icon: <FaMailBulk size={28} />,
+      caption: "View all society and coach queries",
+      gradient: "from-yellow-400 to-orange-500",
+      action: () => router.push("/admin/enquiries"),
     },
     {
       title: "Add New Coach",
@@ -101,7 +140,7 @@ export default function AdminDashboard() {
       animate={{ opacity: 1 }}
       transition={{ duration: 0.8 }}
     >
-      {/* Header with Back Button */}
+      {/* Header */}
       <motion.div className="mb-8 flex items-center justify-between">
         <div className="flex items-center gap-4">
           <button
@@ -130,22 +169,19 @@ export default function AdminDashboard() {
 
       {/* Quick Stats */}
       <motion.div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-        {stats.map((stat) => {
-          const isClickable = stat.link !== "#";
-          return (
-            <motion.div
-              key={stat.label}
-              whileHover={{ scale: isClickable ? 1.05 : 1, rotate: isClickable ? 1 : 0 }}
-              onClick={isClickable ? () => router.push(stat.link) : undefined}
-              className={`rounded-xl p-6 text-white bg-gradient-to-r ${stat.gradient} shadow-lg flex flex-col items-center justify-center ${
-                isClickable ? "cursor-pointer hover:shadow-2xl transition" : ""
-              }`}
-            >
-              <p className="text-3xl font-bold">{stat.value}</p>
-              <p className="text-sm opacity-80">{stat.label}</p>
-            </motion.div>
-          );
-        })}
+        {dashboardStats.map((stat) => (
+          <motion.div
+            key={stat.label}
+            whileHover={{ scale: stat.link !== "#" ? 1.05 : 1, rotate: stat.link !== "#" ? 1 : 0 }}
+            onClick={stat.link !== "#" ? () => router.push(stat.link) : undefined}
+            className={`rounded-xl p-6 text-white bg-gradient-to-r ${stat.gradient} shadow-lg flex flex-col items-center justify-center ${
+              stat.link !== "#" ? "cursor-pointer hover:shadow-2xl transition" : ""
+            }`}
+          >
+            <p className="text-3xl font-bold">{stat.value}</p>
+            <p className="text-sm opacity-80">{stat.label}</p>
+          </motion.div>
+        ))}
       </motion.div>
 
       {/* Navigation Cards */}
@@ -161,7 +197,7 @@ export default function AdminDashboard() {
   );
 }
 
-// Navigation Card Component
+// NavCard Component
 function NavCard({ icon, title, caption, gradient, action }: NavCardProps) {
   return (
     <motion.div
