@@ -152,6 +152,7 @@ export const getAllEnquiries = () => api.get<Enquiry[]>("/enquiries");
 
 // ===================== Prospective Clients APIs =====================
 export interface ProspectiveClientData {
+  sourceForm: any;
   _id?: string;
   fullName?: string;
   phone?: string;
@@ -180,6 +181,62 @@ export const updateProspectiveClient = (id: string, data: Partial<ProspectiveCli
 
 export const deleteProspectiveClient = (id: string) =>
   api.delete(`/prospective/${id}`);
+
+
+// ===================== Customer Enquiry / Admin Notice APIs =====================
+
+export interface CustomerEnquiryData {
+  _id?: string;
+  type: "customer";
+  name: string;
+  phone: string;
+  message: string;
+  societyName?: string; // ✅ added
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface AdminNoticeData {
+  _id?: string;
+  type: "admin";
+  subject: string;
+  message: string;
+  societyName?: string; // ✅ added
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export type CustomerEnquiryOrAdminNotice = CustomerEnquiryData | AdminNoticeData;
+
+// 🔹 Create a customer enquiry
+export const createCustomerEnquiry = (
+  data: Omit<CustomerEnquiryData, "_id" | "createdAt" | "updatedAt" | "type">
+) =>
+  api.post<CustomerEnquiryData>("/customerenquiries", {
+    ...data,
+    type: "customer",
+  });
+
+// 🔹 Create an admin notice
+export const createAdminNotice = (
+  data: Omit<AdminNoticeData, "_id" | "createdAt" | "updatedAt" | "type">
+) =>
+  api.post<AdminNoticeData>("/customerenquiries", {
+    ...data,
+    type: "admin",
+  });
+
+// 🔹 Get all enquiries & notices
+export const getAllCustomerEnquiriesAndAdminNotices = () =>
+  api.get<CustomerEnquiryOrAdminNotice[]>("/customerenquiries");
+
+// 🔹 Get one by ID
+export const getCustomerEnquiryOrAdminNoticeById = (id: string) =>
+  api.get<CustomerEnquiryOrAdminNotice>(`/customerenquiries/${id}`);
+
+// 🔹 Delete
+export const deleteCustomerEnquiryOrAdminNotice = (id: string) =>
+  api.delete(`/customerenquiries/${id}`);
 
 
 export default api;

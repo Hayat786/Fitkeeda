@@ -7,8 +7,10 @@ import {
   FaCalendarAlt,
   FaClipboardList,
   FaSwimmer,
+  FaArrowLeft,
   FaWallet,
   FaUserCircle,
+  FaEnvelope,
   FaBell,
 } from "react-icons/fa";
 import { barlow, bebasNeue, sourceSans } from "@/fonts";
@@ -81,49 +83,50 @@ export default function ResidentDashboard() {
   ];
 
   const cards: Card[] = [
-    {
-      title: "Book a Plan",
-      icon: <FaCalendarAlt size={28} />,
-      action: () => router.push("/residents/booking-form"),
-      gradient: "from-blue-400 to-indigo-600",
-      caption: "Reserve your preferred subscription quickly",
-    },
-    {
-      title: "My Plans",
-      icon: <FaClipboardList size={28} />,
-      action: () => alert("Navigating to My Plans"),
-      gradient: "from-purple-400 to-pink-500",
-      caption: "View all your active and past subscriptions",
-    },
-    {
-      title: "Available Plans",
-      icon: <FaClipboardList size={28} />,
-      action: () => alert("Navigating to Available Plans"),
-      gradient: "from-teal-400 to-green-500",
-      caption: "See all monthly, quarterly, half-year, and yearly options",
-    },
-    {
-      title: "Payments",
-      icon: <FaWallet size={28} />,
-      action: () => alert("Navigating to Payments"),
-      gradient: "from-red-400 to-pink-600",
-      caption: "Check pending or completed payment logs",
-    },
-    {
-      title: "Amenities",
-      icon: <FaSwimmer size={28} />,
-      action: () => alert("Navigating to Amenities"),
-      gradient: "from-yellow-400 to-orange-500",
-      caption: "Explore all available amenities in your society",
-    },
-    {
-      title: "View Profile",
-      icon: <FaUserCircle size={28} />,
-      action: () => alert("Navigating to View Profile"),
-      gradient: "from-gray-400 to-gray-600",
-      caption: "Manage your personal details and contact info",
-    },
-  ];
+  {
+    title: "Book a Plan",
+    icon: <FaCalendarAlt size={28} />,
+    action: () => router.push("/residents/booking-form"),
+    gradient: "from-blue-400 to-indigo-600",
+    caption: "Reserve your preferred subscription quickly",
+  },
+  {
+    title: "My Plans",
+    icon: <FaClipboardList size={28} />,
+    action: () => alert("Navigating to My Plans"),
+    gradient: "from-purple-400 to-pink-500",
+    caption: "View all your active and past subscriptions",
+  },
+  {
+    title: "Available Plans",
+    icon: <FaClipboardList size={28} />,
+    action: () => alert("Navigating to Available Plans"),
+    gradient: "from-teal-400 to-green-500",
+    caption: "See all monthly, quarterly, half-year, and yearly options",
+  },
+  {
+    title: "Payments",
+    icon: <FaWallet size={28} />,
+    action: () => alert("Navigating to Payments"),
+    gradient: "from-red-400 to-pink-600",
+    caption: "Check pending or completed payment logs",
+  },
+  {
+    title: "Enquiries",
+    icon: <FaEnvelope size={28} />,
+    action: () => router.push("/residents/enquiry"), 
+    gradient: "from-yellow-400 to-orange-500",
+    caption: "Send your queries directly to business managers",
+  },
+  {
+    title: "Admin Notices",
+    icon: <FaEnvelope size={28} />,
+    action: () => router.push("/residents/notice"), 
+    gradient: "from-gray-400 to-gray-600",
+    caption: "View all notices shared by your admin",
+  },
+];
+
 
   if (loading) {
     return (
@@ -142,6 +145,18 @@ export default function ResidentDashboard() {
       animate={{ opacity: 1 }}
       transition={{ duration: 0.8 }}
     >
+
+      {/* Back Button */}
+<div className="mb-4">
+  <button
+    onClick={() => router.push("/")}
+    className="flex items-center gap-2 px-3 py-2 rounded-lg bg-white shadow-md hover:bg-gray-100 transition text-gray-800 font-semibold"
+  >
+    <FaArrowLeft />
+    Back
+  </button>
+</div>
+
       {/* Header with notifications */}
       <motion.div className="mb-8 flex items-center justify-between">
         <div>

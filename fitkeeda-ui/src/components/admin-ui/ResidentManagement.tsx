@@ -42,7 +42,7 @@ export default function ResidentFunctions() {
       icon: <FaEnvelope size={28} />,
       caption: "Send important messages to customers",
       gradient: "from-yellow-400 to-orange-500",
-      action: () => router.push("/send-notices-placeholder"),
+      action: () => router.push("/admin/resident/notice"),
     },
     {
       title: "Registered Customers",
@@ -63,7 +63,7 @@ export default function ResidentFunctions() {
       icon: <FaQuestionCircle size={28} />,
       caption: "Respond to all customer inquiries",
       gradient: "from-red-400 to-pink-600",
-      action: () => router.push("/customer-queries-placeholder"),
+      action: () => router.push("/admin/resident/enquiries"),
     },
     {
       title: "Payment Logs",
