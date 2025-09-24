@@ -16,6 +16,29 @@ export const signup = (data: { fullName: string; phone: string; societyName: str
 export const login = (data: { phone: string; password: string }) =>
   api.post("/auth/login", data);
 
+// ===================== Residents APIs =====================
+export interface ResidentData {
+  _id?: string;
+  fullName: string;
+  societyName: string;
+  phone: string;
+  password?: string; // ✅ optional for updates
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export const getAllResidents = () => api.get<ResidentData[]>("/residents");
+
+export const getResidentById = (id: string) => api.get<ResidentData>(`/residents/${id}`);
+
+export const createResident = (data: ResidentData) => api.post<ResidentData>("/residents", data);
+
+export const updateResident = (id: string, data: Partial<ResidentData>) =>
+  api.put<ResidentData>(`/residents/${id}`, data);
+
+export const deleteResident = (id: string) => api.delete(`/residents/${id}`);
+
+
 // ===================== Society APIs =====================
 export const getSocieties = () => api.get("/societies");
 
@@ -126,5 +149,37 @@ export const createSocietyEnquiry = (
 ) => api.post<SocietyEnquiry>("/enquiries", { ...data, type: "society" });
 
 export const getAllEnquiries = () => api.get<Enquiry[]>("/enquiries");
+
+// ===================== Prospective Clients APIs =====================
+export interface ProspectiveClientData {
+  _id?: string;
+  fullName?: string;
+  phone?: string;
+  email?: string;
+  societyName?: string;
+  formSource?: string; // e.g., "session-booking"
+  extraDetails?: any;  // flexible field for any additional form info
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+// Create / add a prospective client
+export const createProspectiveClient = (data: ProspectiveClientData) =>
+  api.post<ProspectiveClientData>("/prospective", data);
+
+// Get all prospective clients
+export const getAllProspectiveClients = () =>
+  api.get<ProspectiveClientData[]>("/prospective");
+
+// Optionally, if you extend the controller later with ID routes:
+export const getProspectiveClientById = (id: string) =>
+  api.get<ProspectiveClientData>(`/prospective/${id}`);
+
+export const updateProspectiveClient = (id: string, data: Partial<ProspectiveClientData>) =>
+  api.put<ProspectiveClientData>(`/prospective/${id}`, data);
+
+export const deleteProspectiveClient = (id: string) =>
+  api.delete(`/prospective/${id}`);
+
 
 export default api;

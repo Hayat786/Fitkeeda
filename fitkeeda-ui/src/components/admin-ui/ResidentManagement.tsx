@@ -49,14 +49,14 @@ export default function ResidentFunctions() {
       icon: <FaUsers size={28} />,
       caption: "View all customers with details",
       gradient: "from-purple-400 to-pink-500",
-      action: () => router.push("/registered-customers-placeholder"),
+      action: () => router.push("/admin/resident/view"),
     },
     {
       title: "Prospective Clients",
       icon: <FaUserTie size={28} />,
       caption: "Track pending clients",
       gradient: "from-gray-400 to-gray-600",
-      action: () => router.push("/prospective-clients-placeholder"),
+      action: () => router.push("/admin/resident/prospective"),
     },
     {
       title: "Customer Queries",

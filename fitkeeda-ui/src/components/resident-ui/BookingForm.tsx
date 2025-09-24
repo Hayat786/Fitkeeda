@@ -7,6 +7,7 @@ import { jwtDecode } from "jwt-decode";
 import { FaUser, FaPhone, FaCalendarAlt, FaFutbol, FaArrowLeft, FaCheck } from "react-icons/fa";
 import { useRouter } from "next/navigation";
 import { createBooking, getAllSessions, SessionData } from "@/utils/api";
+import { useProspectiveClient } from "@/utils/hooks/useProspectiveClients";
 import { barlow, bebasNeue, sourceSans } from "@/fonts";
 
 interface FormData {
@@ -28,12 +29,10 @@ interface DecodedToken {
 export default function BookingForm() {
   const router = useRouter();
   const formRef = useRef<HTMLDivElement>(null);
-
   const [step, setStep] = useState<number>(1);
   const [loading, setLoading] = useState<boolean>(true);
   const [sessions, setSessions] = useState<SessionData[]>([]);
   const [filteredSlots, setFilteredSlots] = useState<string[]>([]);
-
   const [formData, setFormData] = useState<FormData>({
     apartment: "",
     name: "",
@@ -42,6 +41,8 @@ export default function BookingForm() {
     plan: "",
     slot: "",
   });
+
+  const { submitClient, loading: savingClient, error: clientError, success: clientSuccess } = useProspectiveClient();
 
   // Scroll to form section when step changes (mobile fix)
   useEffect(() => {
@@ -61,7 +62,6 @@ export default function BookingForm() {
     try {
       const decoded = jwtDecode<DecodedToken>(token);
 
-      // Prefill user info
       setFormData({
         apartment: decoded.societyName || "",
         name: decoded.fullName || "",
@@ -71,7 +71,6 @@ export default function BookingForm() {
         slot: "",
       });
 
-      // Fetch sessions for this apartment
       getAllSessions()
         .then((res) => {
           const apartmentSessions = (res.data as SessionData[]).filter(
@@ -92,9 +91,7 @@ export default function BookingForm() {
     if (formData.sport) {
       const slots = sessions.filter((s) => s.sport === formData.sport).map((s) => s.slot);
       setFilteredSlots(slots);
-      if (!slots.includes(formData.slot)) {
-        setFormData((prev) => ({ ...prev, slot: "" }));
-      }
+      if (!slots.includes(formData.slot)) setFormData((prev) => ({ ...prev, slot: "" }));
     } else {
       setFilteredSlots([]);
       setFormData((prev) => ({ ...prev, slot: "" }));
@@ -103,6 +100,22 @@ export default function BookingForm() {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  // Handle step 1 -> save prospective client
+  const handleNext = async () => {
+    try {
+      await submitClient({
+        fullName: formData.name,
+        phone: formData.number,
+        societyName: formData.apartment,
+        extraDetails: {}, // you can pass step-specific info here
+        formSource: "booking-form",
+      });
+      setStep(2);
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   const handleSubmit = async () => {
@@ -198,7 +211,7 @@ export default function BookingForm() {
             </h2>
             <p className="text-gray-700 mb-6">Fill in your basic information to proceed.</p>
             <div className="space-y-4">
-              {[
+              {[ 
                 { name: "name", placeholder: "Full Name", icon: FaUser },
                 { name: "apartment", placeholder: "Apartment / Society", icon: FaFutbol },
                 { name: "number", placeholder: "Phone Number", icon: FaPhone },
@@ -220,11 +233,14 @@ export default function BookingForm() {
               })}
             </div>
             <button
-              onClick={() => setStep(2)}
+              onClick={handleNext}
+              disabled={savingClient}
               className="mt-6 w-full flex items-center justify-center gap-2 bg-green-500 hover:bg-green-600 text-white py-3 rounded-xl font-semibold shadow-lg"
             >
               Next <FaArrowLeft className="rotate-180" />
             </button>
+            {/* {clientError && <p className="text-red-500 mt-2">{clientError}</p>}
+            {clientSuccess && <p className="text-green-500 mt-2">Saved successfully!</p>} */}
           </>
         )}
 
@@ -236,7 +252,7 @@ export default function BookingForm() {
             </h2>
             <p className="text-gray-700 mb-6">Choose your sport, plan, and time slot.</p>
             <div className="space-y-4">
-              {[
+              {[ 
                 { name: "sport", placeholder: "Select Sport", icon: FaFutbol, options: sessions.map((s) => s.sport) },
                 { name: "slot", placeholder: "Select Slot", icon: FaCalendarAlt, options: filteredSlots },
                 { name: "plan", placeholder: "Select Plan", icon: FaCalendarAlt, options: ["Monthly", "Quarterly", "Yearly"] },
