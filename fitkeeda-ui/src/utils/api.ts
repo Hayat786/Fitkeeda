@@ -59,6 +59,7 @@ export interface CoachData {
   email: string;
   phone: string;
   location: string;
+  password?:string;
   sessions?: string[]; // Optional
   sports?: string[];   // ✅ specialization
 }
@@ -237,6 +238,20 @@ export const getCustomerEnquiryOrAdminNoticeById = (id: string) =>
 // 🔹 Delete
 export const deleteCustomerEnquiryOrAdminNotice = (id: string) =>
   api.delete(`/customerenquiries/${id}`);
+
+// ===================== Coach Auth APIs =====================
+export interface CoachAuthData {
+  phone: string;
+  password: string; // hashed password will be handled by backend
+}
+
+// Register a new coach auth entry
+export const registerCoachAuth = (data: CoachAuthData) =>
+  api.post("/coach-auth/register", data);
+
+// Login (optional, when you implement login for coaches)
+export const loginCoach = (data: CoachAuthData) =>
+  api.post("/coach-auth/login", data);
 
 
 export default api;

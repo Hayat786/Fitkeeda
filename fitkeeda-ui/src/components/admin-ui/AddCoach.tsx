@@ -9,10 +9,11 @@ import {
   FaPhone,
   FaArrowLeft,
   FaCheck,
-  FaMapMarkerAlt,   // ✅ added map pin icon
+  FaMapMarkerAlt,
+  FaLock,
 } from "react-icons/fa";
 import Image from "next/image";
-import { createCoach, CoachData } from "@/utils/api";
+import { createCoach, CoachData, registerCoachAuth } from "@/utils/api";
 import { bebasNeue, barlow, sourceSans } from "@/fonts";
 
 export default function AddCoachForm() {
@@ -27,8 +28,10 @@ export default function AddCoachForm() {
     phone: "",
     location: "",
     sports: [],
+    password: "",
   });
 
+  const [confirmPassword, setConfirmPassword] = useState<string>("");
   const [sportInput, setSportInput] = useState<string>("");
 
   useEffect(() => {
@@ -59,12 +62,27 @@ export default function AddCoachForm() {
   };
 
   const isStep1Valid =
-    formData.name.trim() && formData.email.trim() && formData.phone.trim();
+    formData.name.trim() &&
+    formData.email.trim() &&
+    formData.phone.trim() &&
+    formData.location.trim();
+
+  const isStep2Valid =
+    (formData.password || "").trim() && formData.password === confirmPassword;
 
   const handleSubmit = async () => {
     try {
       setLoading(true);
+
+      // 1️⃣ Create the coach entry
       await createCoach(formData);
+
+      // 2️⃣ Register coach auth (phone + password)
+      await registerCoachAuth({
+        phone: formData.phone,
+        password: formData.password as string,
+      });
+
       alert("✅ Coach added successfully!");
       router.push("/admin/coaches");
     } catch (error) {
@@ -92,21 +110,11 @@ export default function AddCoachForm() {
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.8 }}
       >
-        <Image
-          src="/full_logo.png"
-          alt="Logo"
-          width={250}
-          height={250}
-          className="mx-auto"
-        />
-        <h1
-          className={`${bebasNeue.className} text-3xl lg:text-5xl text-black mt-4`}
-        >
+        <Image src="/full_logo.png" alt="Logo" width={250} height={250} className="mx-auto" />
+        <h1 className={`${bebasNeue.className} text-3xl lg:text-5xl text-black mt-4`}>
           Add a New Coach
         </h1>
-        <p
-          className={`${barlow.className} text-gray-700 text-base lg:text-xl mt-2`}
-        >
+        <p className={`${barlow.className} text-gray-700 text-base lg:text-xl mt-2`}>
           Fill in coach details to add them to the system.
         </p>
         <button
@@ -127,12 +135,10 @@ export default function AddCoachForm() {
       >
         {/* Progress Bar */}
         <div className="flex justify-center mb-6 space-x-4">
-          {[1, 2].map((s) => (
+          {[1, 2, 3].map((s) => (
             <motion.div
               key={s}
-              className={`h-3 w-12 rounded-full ${
-                s <= step ? "bg-green-500" : "bg-gray-300/40"
-              }`}
+              className={`h-3 w-12 rounded-full ${s <= step ? "bg-green-500" : "bg-gray-300/40"}`}
               initial={{ width: 0 }}
               animate={{ width: "3rem" }}
               transition={{ duration: 0.4, delay: s * 0.2 }}
@@ -140,22 +146,17 @@ export default function AddCoachForm() {
           ))}
         </div>
 
-        {/* Step 1: Form Inputs */}
+        {/* Step 1: Coach Details */}
         {step === 1 && (
           <>
-            <h2
-              className={`${sourceSans.className} text-3xl font-bold text-gray-900 mb-4`}
-            >
+            <h2 className={`${sourceSans.className} text-3xl font-bold text-gray-900 mb-4`}>
               Coach Details
             </h2>
-            <p className="text-gray-600 mb-6">
-              Enter the coach&apos;s personal information.
-            </p>
+            <p className="text-gray-600 mb-6">Enter the coach&apos;s personal information.</p>
 
             <div className="space-y-5">
-              {/* Full Name + Phone in same row on desktop */}
+              {/* Name + Phone */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                {/* Full Name */}
                 <div className="relative">
                   <FaUser className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" />
                   <input
@@ -164,13 +165,9 @@ export default function AddCoachForm() {
                     value={formData.name}
                     onChange={handleChange}
                     placeholder="Full Name"
-                    className="w-full p-3 pl-10 rounded-lg bg-white text-gray-900 
-                               placeholder-gray-400 focus:outline-none focus:ring-2 
-                               focus:ring-green-500 border border-gray-300"
+                    className="w-full p-3 pl-10 rounded-lg bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 border border-gray-300"
                   />
                 </div>
-
-                {/* Phone */}
                 <div className="relative">
                   <FaPhone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" />
                   <input
@@ -179,14 +176,12 @@ export default function AddCoachForm() {
                     value={formData.phone}
                     onChange={handleChange}
                     placeholder="Phone Number"
-                    className="w-full p-3 pl-10 rounded-lg bg-white text-gray-900 
-                               placeholder-gray-400 focus:outline-none focus:ring-2 
-                               focus:ring-green-500 border border-gray-300"
+                    className="w-full p-3 pl-10 rounded-lg bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 border border-gray-300"
                   />
                 </div>
               </div>
 
-              {/* Email stays full width */}
+              {/* Email */}
               <div className="relative">
                 <FaEnvelope className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" />
                 <input
@@ -195,13 +190,11 @@ export default function AddCoachForm() {
                   value={formData.email}
                   onChange={handleChange}
                   placeholder="Email Address"
-                  className="w-full p-3 pl-10 rounded-lg bg-white text-gray-900 
-                             placeholder-gray-400 focus:outline-none focus:ring-2 
-                             focus:ring-green-500 border border-gray-300"
+                  className="w-full p-3 pl-10 rounded-lg bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 border border-gray-300"
                 />
               </div>
 
-              {/* Location with Map Pin */}
+              {/* Location */}
               <div className="relative">
                 <FaMapMarkerAlt className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" />
                 <input
@@ -210,13 +203,11 @@ export default function AddCoachForm() {
                   value={formData.location}
                   onChange={handleChange}
                   placeholder="Location (e.g., Bengaluru)"
-                  className="w-full p-3 pl-10 rounded-lg bg-white text-gray-900 
-                             placeholder-gray-400 focus:outline-none focus:ring-2 
-                             focus:ring-green-500 border border-gray-300"
+                  className="w-full p-3 pl-10 rounded-lg bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 border border-gray-300"
                 />
               </div>
 
-              {/* Sports Specialization Input */}
+              {/* Sports */}
               <div>
                 <label className="mb-2 font-semibold text-gray-700 flex items-center gap-2">
                   Sports Specialization
@@ -227,9 +218,7 @@ export default function AddCoachForm() {
                     value={sportInput}
                     onChange={(e) => setSportInput(e.target.value)}
                     placeholder="Enter a sport (e.g., Tennis)"
-                    className="w-full p-3 rounded-lg bg-white text-gray-900 
-                               placeholder-gray-400 focus:outline-none focus:ring-2 
-                               focus:ring-green-500 border border-gray-300"
+                    className="w-full p-3 rounded-lg bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 border border-gray-300"
                   />
                   <button
                     type="button"
@@ -274,31 +263,98 @@ export default function AddCoachForm() {
           </>
         )}
 
-        {/* Step 2: Confirmation */}
+        {/* Step 2: Password */}
         {step === 2 && (
           <>
-            <h2
-              className={`${sourceSans.className} text-3xl font-bold text-gray-900 mb-4`}
-            >
-              Confirm Details
+            <h2 className={`${sourceSans.className} text-3xl font-bold text-gray-900 mb-4`}>
+              Set Password
             </h2>
-            <p className="text-gray-600 mb-6">
-              Please verify the details before submission.
-            </p>
-            <ul className="mb-6 space-y-4">
-              {Object.entries(formData).map(([key, value], idx) => (
-                <li
-                  key={idx}
-                  className="bg-white p-4 rounded-lg border border-green-300 shadow-sm text-gray-900"
-                >
-                  <strong className="capitalize">{key}:</strong>{" "}
-                  {Array.isArray(value) ? value.join(", ") : value}
-                </li>
-              ))}
-            </ul>
+            <p className="text-gray-600 mb-6">Enter and confirm a password for this coach.</p>
+
+            <div className="space-y-5">
+              <div className="relative">
+                <FaLock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" />
+                <input
+                  type="password"
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  placeholder="Password"
+                  className="w-full p-3 pl-10 rounded-lg bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 border border-gray-300"
+                />
+              </div>
+              <div className="relative">
+                <FaLock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" />
+                <input
+                  type="password"
+                  name="confirmPassword"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  placeholder="Confirm Password"
+                  className="w-full p-3 pl-10 rounded-lg bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 border border-gray-300"
+                />
+              </div>
+              {(formData.password || "") &&
+                confirmPassword &&
+                formData.password !== confirmPassword && (
+                  <p className="text-red-500 text-sm">Passwords do not match!</p>
+                )}
+            </div>
+
             <div className="flex justify-between mt-6">
               <button
                 onClick={() => setStep(1)}
+                className="px-6 py-3 bg-gray-200 text-gray-900 rounded-xl hover:bg-gray-300 flex items-center gap-2"
+              >
+                <FaArrowLeft /> Back
+              </button>
+              <button
+                onClick={() => setStep(3)}
+                disabled={!isStep2Valid}
+                className={`px-6 py-3 rounded-xl font-semibold shadow-lg flex items-center gap-2 ${
+                  !isStep2Valid
+                    ? "bg-gray-400 cursor-not-allowed text-white"
+                    : "bg-green-500 hover:bg-green-600 text-white"
+                }`}
+              >
+                Next <FaArrowLeft className="rotate-180" />
+              </button>
+            </div>
+          </>
+        )}
+
+        {/* Step 3: Review & Submit */}
+        {step === 3 && (
+          <>
+            <h2 className={`${sourceSans.className} text-3xl font-bold text-gray-900 mb-4`}>
+              Review Coach Details
+            </h2>
+            <p className="text-gray-600 mb-6">Verify all details before submitting.</p>
+
+            <div className="space-y-4 text-gray-900">
+              <p>
+                <strong>Name:</strong> {formData.name}
+              </p>
+              <p>
+                <strong>Email:</strong> {formData.email}
+              </p>
+              <p>
+                <strong>Phone:</strong> {formData.phone}
+              </p>
+              <p>
+                <strong>Location:</strong> {formData.location}
+              </p>
+              <p>
+                <strong>Sports:</strong>{" "}
+                {(formData.sports || []).length > 0
+                  ? (formData.sports as string[]).join(", ")
+                  : "None"}
+              </p>
+            </div>
+
+            <div className="flex justify-between mt-6">
+              <button
+                onClick={() => setStep(2)}
                 className="px-6 py-3 bg-gray-200 text-gray-900 rounded-xl hover:bg-gray-300 flex items-center gap-2"
               >
                 <FaArrowLeft /> Back
