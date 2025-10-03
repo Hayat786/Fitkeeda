@@ -253,5 +253,37 @@ export const registerCoachAuth = (data: CoachAuthData) =>
 export const loginCoach = (data: CoachAuthData) =>
   api.post("/coach-auth/login", data);
 
+// ===================== Attendance APIs =====================
+
+
+
+export interface AttendanceRecord {
+  sessionId: string;
+  coachId: string;
+  status: "present" | "absent";
+  date: string;
+
+  // populated session object
+  session: SessionData;
+}
+
+export interface MarkAttendancePayload {
+  coachId: string;
+  sessionId: string;
+  status: "present" | "absent";
+  date?: string;
+}
+
+// 🔹 Seed today's default "absent" attendance records (for a coach or globally)
+export const seedTodayAttendance = (coachId?: string) =>
+  api.post<{ success: boolean; seededCount: number }>("/attendance/seed/today", { coachId });
+
+// 🔹 Mark present/absent for a session
+export const markAttendance = (data: MarkAttendancePayload) =>
+  api.post("/attendance/mark", data);
+
+// 🔹 Get today's attendance for a coach
+export const getTodayAttendance = (coachId: string) =>
+  api.get<AttendanceRecord[]>(`/attendance/today/${coachId}`);
 
 export default api;
