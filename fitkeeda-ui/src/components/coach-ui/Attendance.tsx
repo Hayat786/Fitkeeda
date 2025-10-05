@@ -116,42 +116,64 @@ export default function AttendancePage() {
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {assignedAttendance.map((a, i) => (
-            <motion.div
-              key={a.sessionId}
-              className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden p-5"
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.05 * i, duration: 0.4 }}
-              whileHover={{ scale: 1.02 }}
-            >
-              <div>
-                <h2 className={`text-lg font-semibold text-gray-800 ${sourceSans.className}`}>
-                  <FaDumbbell className="inline text-purple-500 mr-2" />
-                  {a.session?.sport}
-                </h2>
-                <p className="text-sm text-gray-700 flex items-center gap-2 mt-2">
-                  <FaMapMarkerAlt className="text-purple-400" />
-                  {a.session?.apartment}
-                </p>
-                <p className="text-sm text-gray-700 flex items-center gap-2 mt-1">
-                  <FaClock className="text-fuchsia-500" />
-                  {a.session?.slot}
-                </p>
-                <p className={`text-xs text-gray-400 mt-1 ${sourceSans.className}`}>
-                  Date: {new Date(a.date).toLocaleDateString()}
-                </p>
-              </div>
-              <button
-                onClick={() => toggleAttendance(a.sessionId, a.status)}
-                className={`mt-4 w-full px-4 py-2 rounded-lg text-white font-semibold transition ${
-                  a.status === "present" ? "bg-green-500 hover:bg-green-600" : "bg-red-500 hover:bg-red-600"
-                }`}
-              >
-                {a.status === "present" ? "Present" : "Absent"}
-              </button>
-            </motion.div>
-          ))}
+          // inside the map() for assignedAttendance
+{assignedAttendance.map((a, i) => {
+  // parse session.slot to get session start time today
+  const [hoursStr, minutesStr] = a.session?.slot.split(":") || ["0", "0"];
+  const sessionTime = new Date();
+  sessionTime.setHours(parseInt(hoursStr, 10), parseInt(minutesStr, 10), 0, 0);
+
+  const now = new Date();
+  const startWindow = new Date(sessionTime.getTime() - 10 * 60 * 1000); // 10 min before
+  const endWindow = new Date(sessionTime.getTime() + 10 * 60 * 1000);   // 10 min after
+  const canMark = now >= startWindow && now <= endWindow;
+
+  return (
+    <motion.div
+      key={a.sessionId}
+      className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden p-5"
+      initial={{ opacity: 0, y: 30 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0.05 * i, duration: 0.4 }}
+      whileHover={{ scale: 1.02 }}
+    >
+      <div>
+        <h2 className={`text-lg font-semibold text-gray-800 ${sourceSans.className}`}>
+          <FaDumbbell className="inline text-purple-500 mr-2" />
+          {a.session?.sport}
+        </h2>
+        <p className="text-sm text-gray-700 flex items-center gap-2 mt-2">
+          <FaMapMarkerAlt className="text-purple-400" />
+          {a.session?.apartment}
+        </p>
+        <p className="text-sm text-gray-700 flex items-center gap-2 mt-1">
+          <FaClock className="text-fuchsia-500" />
+          {a.session?.slot}
+        </p>
+        <p className={`text-xs text-gray-400 mt-1 ${sourceSans.className}`}>
+          Date: {new Date(a.date).toLocaleDateString()}
+        </p>
+      </div>
+      <button
+        onClick={() => toggleAttendance(a.sessionId, a.status)}
+        disabled={!canMark} // disabled outside window
+        className={`mt-4 w-full px-4 py-2 rounded-lg text-white font-semibold transition ${
+          a.status === "present" 
+            ? "bg-green-500 hover:bg-green-600" 
+            : "bg-red-500 hover:bg-red-600"
+        } ${!canMark ? "opacity-50 cursor-not-allowed" : ""}`}
+      >
+        {a.status === "present" ? "Present" : "Absent"}
+      </button>
+      {!canMark && (
+        <p className="text-xs text-gray-500 mt-1">
+          Attendance can only be marked 10 minutes before or after the session start time
+        </p>
+      )}
+    </motion.div>
+  );
+})}
+
         </div>
       )}
     </motion.div>

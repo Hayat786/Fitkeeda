@@ -6,6 +6,9 @@ import Image from "next/image";
 import { sourceSans, bebasNeue, barlow } from "@/fonts";
 import { getSocieties, createSession } from "@/utils/api";
 import { useRouter } from "next/navigation";
+import TimePicker from "react-time-picker";
+import "react-time-picker/dist/TimePicker.css";
+import "react-clock/dist/Clock.css";
 
 interface Society {
   _id: string;
@@ -49,13 +52,15 @@ export default function CreateSessionPage() {
   }, [selectedSociety, societies]);
 
   const handleSubmit = async () => {
-    if (!selectedSociety || !selectedSport || !slot) return alert("Please fill all fields");
+    if (!selectedSociety || !selectedSport || !slot)
+      return alert("Please fill all fields");
+
     setSubmitting(true);
     try {
       await createSession({
         apartment: selectedSociety,
         sport: selectedSport,
-        slot,
+        slot, // e.g. "03:00 PM"
       });
       alert("Session created successfully!");
       router.push("/admin/resident");
@@ -70,7 +75,9 @@ export default function CreateSessionPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-screen gradient-bg animate-pulse">
-        <p className={`text-2xl font-semibold text-gray-700 ${sourceSans.className}`}>
+        <p
+          className={`text-2xl font-semibold text-gray-700 ${sourceSans.className}`}
+        >
           Loading Societies...
         </p>
       </div>
@@ -84,10 +91,12 @@ export default function CreateSessionPage() {
       animate={{ opacity: 1 }}
       transition={{ duration: 0.8 }}
     >
-      {/* Header with logo */}
+      {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center md:space-x-6 mb-8">
         <Image src="/logo.png" alt="Logo" width={80} height={80} />
-        <h1 className={`text-3xl md:text-4xl font-bold text-gray-800 mt-4 md:mt-0 ${bebasNeue.className}`}>
+        <h1
+          className={`text-3xl md:text-4xl font-bold text-gray-800 mt-4 md:mt-0 ${bebasNeue.className}`}
+        >
           Create New Session
         </h1>
       </div>
@@ -99,7 +108,11 @@ export default function CreateSessionPage() {
         className="w-full max-w-2xl mx-auto bg-white rounded-2xl p-8 shadow-xl flex flex-col space-y-6"
       >
         {/* Society Dropdown */}
-        <label className={`text-gray-700 font-semibold ${barlow.className}`}>Society</label>
+        <label
+          className={`text-gray-700 font-semibold ${barlow.className}`}
+        >
+          Society
+        </label>
         <select
           value={selectedSociety}
           onChange={(e) => setSelectedSociety(e.target.value)}
@@ -114,14 +127,20 @@ export default function CreateSessionPage() {
         </select>
 
         {/* Sport Dropdown */}
-        <label className={`text-gray-700 font-semibold ${barlow.className}`}>Sport</label>
+        <label
+          className={`text-gray-700 font-semibold ${barlow.className}`}
+        >
+          Sport
+        </label>
         <select
           value={selectedSport}
           onChange={(e) => setSelectedSport(e.target.value)}
           className="px-4 py-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400 transition text-gray-800 font-medium"
           disabled={sports.length === 0}
         >
-          <option value="">{sports.length === 0 ? "Select society first" : "Select Sport"}</option>
+          <option value="">
+            {sports.length === 0 ? "Select society first" : "Select Sport"}
+          </option>
           {sports.map((sport) => (
             <option key={sport} value={sport}>
               {sport}
@@ -129,15 +148,22 @@ export default function CreateSessionPage() {
           ))}
         </select>
 
-        {/* Slot Input */}
-        <label className={`text-gray-700 font-semibold ${barlow.className}`}>Time Slot</label>
-        <input
-          type="text"
-          value={slot}
-          onChange={(e) => setSlot(e.target.value)}
-          placeholder="Enter time slot (e.g., 4pm)"
-          className="px-4 py-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400 transition text-gray-800 font-medium"
-        />
+        {/* Time Slot Picker */}
+        <label
+          className={`text-gray-700 font-semibold ${barlow.className}`}
+        >
+          Time Slot
+        </label>
+        <div className="px-4 py-3 border border-gray-300 rounded-xl focus-within:ring-2 focus-within:ring-blue-400 transition">
+          <TimePicker
+            onChange={(value) => setSlot(value || "")}
+            value={slot}
+            format="hh:mm a"
+            disableClock={false}
+            clearIcon={null}
+            className="w-full text-gray-800 font-medium"
+          />
+        </div>
 
         {/* Buttons */}
         <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-3 sm:space-y-0 mt-4">
