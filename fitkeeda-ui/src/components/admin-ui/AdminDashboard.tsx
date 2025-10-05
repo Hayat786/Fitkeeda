@@ -3,7 +3,14 @@
 import { useEffect, useState, JSX } from "react";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
-import { FaArrowLeft, FaBell, FaMailBulk, FaClipboardList, FaBookOpen } from "react-icons/fa";
+import {
+  FaArrowLeft,
+  FaBell,
+  FaMailBulk,
+  FaClipboardList,
+  FaBookOpen,
+  FaPlusCircle,
+} from "react-icons/fa";
 import { MdPeople } from "react-icons/md";
 import { barlow, bebasNeue, sourceSans } from "@/fonts";
 import Image from "next/image";
@@ -131,6 +138,13 @@ export default function AdminDashboard() {
       gradient: "from-indigo-400 to-blue-500",
       action: () => router.push("/admin/societies/new"),
     },
+    {
+      title: "Add Booking",
+      icon: <FaPlusCircle size={28} />,
+      caption: "Manually create a new resident booking",
+      gradient: "from-cyan-400 to-blue-600",
+      action: () => router.push("/admin/booking"),
+    },
   ];
 
   return (
@@ -149,12 +163,22 @@ export default function AdminDashboard() {
           >
             <FaArrowLeft className="text-gray-700" />
           </button>
-          <Image src="/logo.png" alt="Logo" width={60} height={60} className="rounded-full" />
+          <Image
+            src="/logo.png"
+            alt="Logo"
+            width={60}
+            height={60}
+            className="rounded-full"
+          />
           <div>
-            <h1 className={`text-4xl md:text-5xl font-bold text-gray-800 ${bebasNeue.className}`}>
+            <h1
+              className={`text-4xl md:text-5xl font-bold text-gray-800 ${bebasNeue.className}`}
+            >
               Welcome, Admin!
             </h1>
-            <p className={`text-xl text-gray-600 ${barlow.className}`}>{today}</p>
+            <p className={`text-xl text-gray-600 ${barlow.className}`}>
+              {today}
+            </p>
           </div>
         </div>
         <div className="relative cursor-pointer">
@@ -172,10 +196,17 @@ export default function AdminDashboard() {
         {dashboardStats.map((stat) => (
           <motion.div
             key={stat.label}
-            whileHover={{ scale: stat.link !== "#" ? 1.05 : 1, rotate: stat.link !== "#" ? 1 : 0 }}
-            onClick={stat.link !== "#" ? () => router.push(stat.link) : undefined}
+            whileHover={{
+              scale: stat.link !== "#" ? 1.05 : 1,
+              rotate: stat.link !== "#" ? 1 : 0,
+            }}
+            onClick={
+              stat.link !== "#" ? () => router.push(stat.link) : undefined
+            }
             className={`rounded-xl p-6 text-white bg-gradient-to-r ${stat.gradient} shadow-lg flex flex-col items-center justify-center ${
-              stat.link !== "#" ? "cursor-pointer hover:shadow-2xl transition" : ""
+              stat.link !== "#"
+                ? "cursor-pointer hover:shadow-2xl transition"
+                : ""
             }`}
           >
             <p className="text-3xl font-bold">{stat.value}</p>
@@ -186,7 +217,11 @@ export default function AdminDashboard() {
 
       {/* Navigation Cards */}
       <motion.div>
-        <h2 className={`text-2xl font-bold mb-4 text-gray-800 ${bebasNeue.className}`}>Admin Shortcuts</h2>
+        <h2
+          className={`text-2xl font-bold mb-4 text-gray-800 ${bebasNeue.className}`}
+        >
+          Admin Shortcuts
+        </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {navCards.map((card, index) => (
             <NavCard key={index} {...card} />
@@ -204,7 +239,11 @@ function NavCard({ icon, title, caption, gradient, action }: NavCardProps) {
       initial={{ opacity: 0, y: 50 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6 }}
-      whileHover={{ scale: 1.05, rotate: 2, boxShadow: "0 10px 20px rgba(0,0,0,0.2)" }}
+      whileHover={{
+        scale: 1.05,
+        rotate: 2,
+        boxShadow: "0 10px 20px rgba(0,0,0,0.2)",
+      }}
       onClick={action}
       className={`cursor-pointer rounded-xl p-6 flex flex-col items-start justify-start text-white bg-gradient-to-r ${gradient} shadow-lg`}
     >

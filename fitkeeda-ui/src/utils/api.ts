@@ -97,6 +97,7 @@ export interface BookingData {
   plan?: string;
   slot?: string;
   paymentStatus?: string;
+  createdBy?: string;
 }
 
 export const createBooking = (data: BookingData) => api.post("/bookings", data);
@@ -262,6 +263,7 @@ export interface AttendanceRecord {
   coachId: string;
   status: "present" | "absent";
   date: string;
+  markedAt?: string;
 
   // populated session object
   session: SessionData;
