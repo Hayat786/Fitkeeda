@@ -77,6 +77,7 @@ export interface SessionData {
   apartment: string;
   sport: string;
   slot: string;
+  price?: number;
   assignedCoach?: null | { _id: string; name: string; email: string };
 }
 
@@ -95,6 +96,7 @@ export interface BookingData {
   number: string;
   sport?: string;
   plan?: string;
+  price: number;
   slot?: string;
   paymentStatus?: string;
   createdBy?: string;
@@ -287,5 +289,12 @@ export const markAttendance = (data: MarkAttendancePayload) =>
 // 🔹 Get today's attendance for a coach
 export const getTodayAttendance = (coachId: string) =>
   api.get<AttendanceRecord[]>(`/attendance/today/${coachId}`);
+
+
+
+
+export const createOrder = (amount: number) =>
+  api.post("/payments/create-order", { amount });
+
 
 export default api;

@@ -1,6 +1,7 @@
 // app/layout.tsx
 import "./globals.css";
 import type { Metadata, Viewport } from "next";
+import RazorpayLoader from "./razorpay-loader"; // 👈 client component
 
 export const metadata: Metadata = {
   title: "Fitkeeda",
@@ -53,7 +54,12 @@ export const viewport: Viewport = {
   themeColor: "#ffffff", // replace with Fitkeeda brand color if needed
 };
 
+
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
+
+  
+
   return (
     <html lang="en">
       <head>
@@ -78,7 +84,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         {/* Optional Safari pinned tab icon */}
         <link rel="mask-icon" href="/favicon-apple.png" color="#5bbad5" />
       </head>
-      <body>{children}</body>
+      <body>
+        <RazorpayLoader /> {/* 👈 loads checkout.js on the client side */}
+        {children}
+      </body>
     </html>
   );
 }

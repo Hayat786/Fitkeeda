@@ -116,7 +116,7 @@ export default function AttendancePage() {
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          // inside the map() for assignedAttendance
+          
 {assignedAttendance.map((a, i) => {
   // parse session.slot to get session start time today
   const [hoursStr, minutesStr] = a.session?.slot.split(":") || ["0", "0"];

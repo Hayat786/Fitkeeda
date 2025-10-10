@@ -4,9 +4,16 @@ import { useEffect, useState, useRef } from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { jwtDecode } from "jwt-decode";
-import { FaUser, FaPhone, FaCalendarAlt, FaFutbol, FaArrowLeft, FaCheck } from "react-icons/fa";
+import {
+  FaUser,
+  FaPhone,
+  FaCalendarAlt,
+  FaFutbol,
+  FaArrowLeft,
+  FaCheck,
+} from "react-icons/fa";
 import { useRouter } from "next/navigation";
-import { createBooking, getAllSessions, SessionData } from "@/utils/api";
+import { createBooking, getAllSessions, SessionData , createOrder} from "@/utils/api";
 import { useProspectiveClient } from "@/utils/hooks/useProspectiveClients";
 import { barlow, bebasNeue, sourceSans } from "@/fonts";
 
@@ -15,7 +22,6 @@ interface FormData {
   name: string;
   number: string;
   sport: string;
-  plan: string;
   slot: string;
 }
 
@@ -33,25 +39,25 @@ export default function BookingForm() {
   const [loading, setLoading] = useState<boolean>(true);
   const [sessions, setSessions] = useState<SessionData[]>([]);
   const [filteredSlots, setFilteredSlots] = useState<string[]>([]);
+  const [price, setPrice] = useState<number | null>(null);
+
   const [formData, setFormData] = useState<FormData>({
     apartment: "",
     name: "",
     number: "",
     sport: "",
-    plan: "",
     slot: "",
   });
 
-  const { submitClient, loading: savingClient, error: clientError, success: clientSuccess } = useProspectiveClient();
+  const { submitClient, loading: savingClient } = useProspectiveClient();
 
-  // Scroll to form section when step changes (mobile fix)
+  // Scroll to top when step changes
   useEffect(() => {
-    if (formRef.current) {
+    if (formRef.current)
       formRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
-    }
   }, [step]);
 
-  // Fetch user data and sessions
+  // Fetch user + sessions
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) {
@@ -61,13 +67,11 @@ export default function BookingForm() {
 
     try {
       const decoded = jwtDecode<DecodedToken>(token);
-
       setFormData({
         apartment: decoded.societyName || "",
         name: decoded.fullName || "",
         number: decoded.phone || "",
         sport: "",
-        plan: "",
         slot: "",
       });
 
@@ -86,30 +90,42 @@ export default function BookingForm() {
     }
   }, []);
 
-  // Update available slots when sport changes
+  // Update available slots based on sport
   useEffect(() => {
     if (formData.sport) {
-      const slots = sessions.filter((s) => s.sport === formData.sport).map((s) => s.slot);
+      const slots = sessions
+        .filter((s) => s.sport === formData.sport)
+        .map((s) => s.slot);
       setFilteredSlots(slots);
-      if (!slots.includes(formData.slot)) setFormData((prev) => ({ ...prev, slot: "" }));
+      if (!slots.includes(formData.slot))
+        setFormData((prev) => ({ ...prev, slot: "" }));
     } else {
       setFilteredSlots([]);
       setFormData((prev) => ({ ...prev, slot: "" }));
     }
   }, [formData.sport, sessions]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  // Update price when sport or slot changes
+  useEffect(() => {
+    const session = sessions.find(
+      (s) => s.sport === formData.sport && s.slot === formData.slot
+    );
+    setPrice(session?.price ?? null);
+  }, [formData.sport, formData.slot, sessions]);
+
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // Handle step 1 -> save prospective client
   const handleNext = async () => {
     try {
       await submitClient({
         fullName: formData.name,
         phone: formData.number,
         societyName: formData.apartment,
-        extraDetails: {}, // you can pass step-specific info here
+        extraDetails: {},
         sourceForm: "booking-form",
       });
       setStep(2);
@@ -119,33 +135,105 @@ export default function BookingForm() {
   };
 
   const handleSubmit = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        alert("❌ User not recognized!");
-        return;
-      }
-
-      const decoded = jwtDecode<{ id: string }>(token);
-
-      const bookingPayload = {
-        ...formData,
-        residentId: decoded.id,
-      };
-
-      await createBooking(bookingPayload);
-      alert("✅ Booking created successfully!");
-      router.push("/residents");
-    } catch (err) {
-      console.error(err);
-      alert("❌ Failed to create booking");
+  try {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      alert("❌ User not recognized!");
+      return;
     }
-  };
+
+    const decoded = jwtDecode<{ id: string }>(token);
+    if (!decoded.id) {
+      alert("❌ User ID missing in token!");
+      return;
+    }
+
+    if (!price) {
+      alert("⚠️ Please select a valid sport and slot before proceeding.");
+      return;
+    }
+
+    // 1️⃣ Create Razorpay order
+    const orderResponse = await createOrder(price);
+    const { id: orderId, amount } = orderResponse.data;
+
+    // 2️⃣ Prepare booking payload
+    const bookingPayload = {
+  residentId: decoded.id,
+  name: formData.name,
+  number: formData.number,
+  apartment: formData.apartment,
+  sport: formData.sport,
+  slot: formData.slot,
+  price,
+};
+
+
+    // 3️⃣ Open Razorpay checkout
+    const options = {
+      key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
+      amount,
+      currency: "INR",
+      name: "cr4fted",
+      description: "Session Booking Payment",
+      order_id: orderId,
+      handler: async function (response: any) {
+        try {
+          // Verify payment signature
+          const verifyRes = await fetch(
+            `${process.env.NEXT_PUBLIC_API_BASE_URL}/payments/verify`,
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                order_id: response.razorpay_order_id,
+                payment_id: response.razorpay_payment_id,
+                signature: response.razorpay_signature,
+              }),
+            }
+          );
+
+          const verifyData = await verifyRes.json();
+
+          if (verifyData.success) {
+            // ✅ Only create booking after verification
+            await createBooking({
+            ...bookingPayload,
+            paymentStatus: "success",
+          });
+            alert("✅ Payment Successful! Booking confirmed.");
+            router.push("/residents");
+          } else {
+            alert("❌ Payment verification failed.");
+          }
+        } catch (err) {
+          console.error(err);
+          alert("❌ Error verifying payment");
+        }
+      },
+      prefill: {
+        name: formData.name,
+        contact: formData.number,
+      },
+      theme: { color: "#10B981" },
+    };
+
+    const rzp = new (window as any).Razorpay(options);
+    rzp.open();
+  } catch (err) {
+    console.error(err);
+    alert("❌ Something went wrong during booking");
+  }
+};
+
+
 
   if (loading) {
     return (
       <div className="flex items-center justify-center h-screen bg-white">
-        <p className="text-xl text-black animate-pulse">Loading booking form...</p>
+        <p className="text-xl text-black animate-pulse">
+          Loading booking form...
+        </p>
       </div>
     );
   }
@@ -160,19 +248,30 @@ export default function BookingForm() {
         <FaArrowLeft />
       </button>
 
-      {/* Left: Logo + Text */}
+      {/* Left Section */}
       <motion.div
         className="flex flex-col justify-center items-center text-center lg:text-left lg:w-1/3 p-4 lg:p-6 lg:h-screen gap-6"
         initial={{ opacity: 0, x: -50 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.8 }}
       >
-        <Image src="/full_logo.png" alt="Logo" width={250} height={250} className="mx-auto" />
-        <h1 className={`${bebasNeue.className} text-3xl lg:text-5xl text-black mt-4`}>
+        <Image
+          src="/full_logo.png"
+          alt="Logo"
+          width={250}
+          height={250}
+          className="mx-auto"
+        />
+        <h1
+          className={`${bebasNeue.className} text-3xl lg:text-5xl text-black mt-4`}
+        >
           Book Your Spot Today!
         </h1>
-        <p className={`${barlow.className} text-gray-700 text-base lg:text-xl mt-2`}>
-          Stay active, stay healthy. Choose your sport, pick your slot, and get moving!
+        <p
+          className={`${barlow.className} text-gray-700 text-base lg:text-xl mt-2`}
+        >
+          Stay active, stay healthy. Choose your sport, pick your slot, and get
+          moving!
         </p>
         <button
           onClick={() => router.push("/residents")}
@@ -182,7 +281,7 @@ export default function BookingForm() {
         </button>
       </motion.div>
 
-      {/* Right: Form */}
+      {/* Right Section (Form) */}
       <motion.div
         ref={formRef}
         className="flex flex-col justify-between backdrop-blur-xl bg-black/5 p-6 lg:p-8 rounded-2xl shadow-2xl w-full max-w-lg border border-black/10 lg:h-[90%] overflow-auto"
@@ -190,12 +289,14 @@ export default function BookingForm() {
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.8 }}
       >
-        {/* Progress Bar */}
+        {/* Step Indicator */}
         <div className="flex justify-center mb-6 space-x-4">
           {[1, 2].map((s) => (
             <motion.div
               key={s}
-              className={`h-3 w-12 rounded-full ${s <= step ? "bg-green-500" : "bg-gray-300/40"}`}
+              className={`h-3 w-12 rounded-full ${
+                s <= step ? "bg-green-500" : "bg-gray-300/40"
+              }`}
               initial={{ width: 0 }}
               animate={{ width: "3rem" }}
               transition={{ duration: 0.4, delay: s * 0.2 }}
@@ -203,17 +304,25 @@ export default function BookingForm() {
           ))}
         </div>
 
-        {/* Step 1: Basic Info */}
+        {/* Step 1 */}
         {step === 1 && (
           <>
-            <h2 className={`${sourceSans.className} text-3xl font-bold text-black mb-4`}>
+            <h2
+              className={`${sourceSans.className} text-3xl font-bold text-black mb-4`}
+            >
               Your Details
             </h2>
-            <p className="text-gray-700 mb-6">Fill in your basic information to proceed.</p>
+            <p className="text-gray-700 mb-6">
+              Fill in your basic information to proceed.
+            </p>
             <div className="space-y-4">
-              {[ 
+              {[
                 { name: "name", placeholder: "Full Name", icon: FaUser },
-                { name: "apartment", placeholder: "Apartment / Society", icon: FaFutbol },
+                {
+                  name: "apartment",
+                  placeholder: "Apartment / Society",
+                  icon: FaFutbol,
+                },
                 { name: "number", placeholder: "Phone Number", icon: FaPhone },
               ].map((field, idx) => {
                 const Icon = field.icon;
@@ -239,23 +348,34 @@ export default function BookingForm() {
             >
               Next <FaArrowLeft className="rotate-180" />
             </button>
-            {/* {clientError && <p className="text-red-500 mt-2">{clientError}</p>}
-            {clientSuccess && <p className="text-green-500 mt-2">Saved successfully!</p>} */}
           </>
         )}
 
-        {/* Step 2: Booking Info */}
+        {/* Step 2 */}
         {step === 2 && (
           <>
-            <h2 className={`${sourceSans.className} text-3xl font-bold text-black mb-4`}>
+            <h2
+              className={`${sourceSans.className} text-3xl font-bold text-black mb-4`}
+            >
               Booking Details
             </h2>
-            <p className="text-gray-700 mb-6">Choose your sport, plan, and time slot.</p>
+            <p className="text-gray-700 mb-6">
+              Choose your sport and preferred time slot.
+            </p>
             <div className="space-y-4">
-              {[ 
-                { name: "sport", placeholder: "Select Sport", icon: FaFutbol, options: sessions.map((s) => s.sport) },
-                { name: "slot", placeholder: "Select Slot", icon: FaCalendarAlt, options: filteredSlots },
-                { name: "plan", placeholder: "Select Plan", icon: FaCalendarAlt, options: ["Monthly", "Quarterly", "Yearly"] },
+              {[
+                {
+                  name: "sport",
+                  placeholder: "Select Sport",
+                  icon: FaFutbol,
+                  options: [...new Set(sessions.map((s) => s.sport))],
+                },
+                {
+                  name: "slot",
+                  placeholder: "Select Slot",
+                  icon: FaCalendarAlt,
+                  options: filteredSlots,
+                },
               ].map((field, idx) => {
                 const Icon = field.icon;
                 return (
@@ -277,7 +397,19 @@ export default function BookingForm() {
                   </div>
                 );
               })}
+
+              {/* Price Display */}
+              {price !== null && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="mt-2 p-3 bg-green-100 text-green-800 rounded-xl font-semibold text-center"
+                >
+                  Price: ₹ {price}
+                </motion.div>
+              )}
             </div>
+
             <div className="flex justify-between mt-6">
               <button
                 onClick={() => setStep(1)}

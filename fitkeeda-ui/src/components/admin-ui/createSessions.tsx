@@ -23,6 +23,7 @@ export default function CreateSessionPage() {
   const [sports, setSports] = useState<string[]>([]);
   const [selectedSport, setSelectedSport] = useState<string>("");
   const [slot, setSlot] = useState<string>("");
+  const [price, setPrice] = useState<number | "">("");
   const [loading, setLoading] = useState<boolean>(true);
   const [submitting, setSubmitting] = useState<boolean>(false);
 
@@ -52,8 +53,8 @@ export default function CreateSessionPage() {
   }, [selectedSociety, societies]);
 
   const handleSubmit = async () => {
-    if (!selectedSociety || !selectedSport || !slot)
-      return alert("Please fill all fields");
+    if (!selectedSociety || !selectedSport || !slot || price === "")
+      return alert("Please fill all fields including price");
 
     setSubmitting(true);
     try {
@@ -61,6 +62,7 @@ export default function CreateSessionPage() {
         apartment: selectedSociety,
         sport: selectedSport,
         slot, // e.g. "03:00 PM"
+        price, // new field
       });
       alert("Session created successfully!");
       router.push("/admin/resident");
@@ -108,9 +110,7 @@ export default function CreateSessionPage() {
         className="w-full max-w-2xl mx-auto bg-white rounded-2xl p-8 shadow-xl flex flex-col space-y-6"
       >
         {/* Society Dropdown */}
-        <label
-          className={`text-gray-700 font-semibold ${barlow.className}`}
-        >
+        <label className={`text-gray-700 font-semibold ${barlow.className}`}>
           Society
         </label>
         <select
@@ -127,9 +127,7 @@ export default function CreateSessionPage() {
         </select>
 
         {/* Sport Dropdown */}
-        <label
-          className={`text-gray-700 font-semibold ${barlow.className}`}
-        >
+        <label className={`text-gray-700 font-semibold ${barlow.className}`}>
           Sport
         </label>
         <select
@@ -149,9 +147,7 @@ export default function CreateSessionPage() {
         </select>
 
         {/* Time Slot Picker */}
-        <label
-          className={`text-gray-700 font-semibold ${barlow.className}`}
-        >
+        <label className={`text-gray-700 font-semibold ${barlow.className}`}>
           Time Slot
         </label>
         <div className="px-4 py-3 border border-gray-300 rounded-xl focus-within:ring-2 focus-within:ring-blue-400 transition">
@@ -164,6 +160,19 @@ export default function CreateSessionPage() {
             className="w-full text-gray-800 font-medium"
           />
         </div>
+
+        {/* Price Input */}
+        <label className={`text-gray-700 font-semibold ${barlow.className}`}>
+          Price (₹)
+        </label>
+        <input
+          type="number"
+          min={0}
+          value={price}
+          onChange={(e) => setPrice(Number(e.target.value))}
+          placeholder="Enter session price in rupees"
+          className="px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 transition w-full text-gray-800 font-medium"
+        />
 
         {/* Buttons */}
         <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-3 sm:space-y-0 mt-4">
