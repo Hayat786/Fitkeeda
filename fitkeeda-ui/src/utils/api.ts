@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_BASE_URL = "http://localhost:5000"; // change to your backend URL
+const API_BASE_URL = "http://localhost:8080"; // change to your backend URL
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -8,6 +8,24 @@ const api = axios.create({
     "Content-Type": "application/json",
   },
 });
+
+
+
+// ===================== Admin Auth APIs =====================
+
+export interface AdminLoginData {
+  phone: string;
+  password: string;
+}
+
+// 🔹 Admin Login → returns { access_token }
+export const adminLogin = (data: AdminLoginData) =>
+  api.post<{ access_token: string }>("/admin/login", data);
+
+// 🔹 Verify Admin Token
+export const verifyAdminToken = (token: string) =>
+  api.post("/admin/verify", { token });
+
 
 // ===================== Auth APIs =====================
 export const signup = (data: { fullName: string; phone: string; societyName: string; password: string }) =>
@@ -76,6 +94,8 @@ export interface SessionData {
   _id?: string;
   apartment: string;
   sport: string;
+  plan: string;
+  months: number;
   slot: string;
   price?: number;
   assignedCoach?: null | { _id: string; name: string; email: string };
@@ -90,6 +110,7 @@ export const assignCoachToSession = (sessionId: string, coachId: string) =>
 
 // ===================== Bookings APIs =====================
 export interface BookingData {
+  residentId: string;
   _id?: string;
   apartment: string;
   name: string;
@@ -100,6 +121,9 @@ export interface BookingData {
   slot?: string;
   paymentStatus?: string;
   createdBy?: string;
+  months?: number;        // optional input when creating
+  expiryDate?: string;    // returned by backend
+  isActive?: boolean;     // returned by backend
 }
 
 export const createBooking = (data: BookingData) => api.post("/bookings", data);
@@ -252,9 +276,18 @@ export interface CoachAuthData {
 export const registerCoachAuth = (data: CoachAuthData) =>
   api.post("/coach-auth/register", data);
 
-// Login (optional, when you implement login for coaches)
+// Login for coaches
 export const loginCoach = (data: CoachAuthData) =>
   api.post("/coach-auth/login", data);
+
+// Verify coach JWT token
+export const verifyCoachToken = (token: string) =>
+  api.get("/coach-auth/verify", {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
 
 // ===================== Attendance APIs =====================
 

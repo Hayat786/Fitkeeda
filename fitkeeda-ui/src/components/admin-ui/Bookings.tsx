@@ -28,6 +28,16 @@ export default function BookingsPage() {
     fetchBookings();
   }, []);
 
+  // Helper to calculate days left for expiry
+  const getDaysLeft = (expiryDate?: string) => {
+    if (!expiryDate) return null;
+    const now = new Date();
+    const expiry = new Date(expiryDate);
+    const diff = expiry.getTime() - now.getTime();
+    const days = Math.ceil(diff / (1000 * 60 * 60 * 24));
+    return days;
+  };
+
   const handleEdit = (id: string) => {
     console.log("Edit booking:", id);
   };
@@ -52,6 +62,11 @@ export default function BookingsPage() {
     );
   }
 
+  // Filter expired bookings
+  const activeBookings = bookings.filter(
+    (b) => b.expiryDate && getDaysLeft(b.expiryDate)! > 0
+  );
+
   return (
     <motion.div
       className="min-h-screen p-6 gradient-bg"
@@ -59,7 +74,7 @@ export default function BookingsPage() {
       animate={{ opacity: 1 }}
       transition={{ duration: 0.8 }}
     >
-      {/* Header with back button */}
+      {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center md:space-x-4 mb-8">
         <div className="flex items-center space-x-3 mb-4 md:mb-0">
           <button
@@ -77,51 +92,79 @@ export default function BookingsPage() {
 
       {/* Bookings Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {bookings.map((booking, index) => {
-  // Skip any bookings without _id just in case
-  if (!booking._id) return null;
+        {activeBookings.map((booking, index) => {
+          const daysLeft = getDaysLeft(booking.expiryDate)!;
+          const isNearExpiry = daysLeft <= 7;
 
-  return (
-    <motion.div
-      key={booking._id}
-      initial={{ opacity: 0, y: 30 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.1 * index, duration: 0.6 }}
-      whileHover={{ scale: 1.05, rotate: 1.5, boxShadow: "0 10px 20px rgba(0,0,0,0.15)" }}
-      className="rounded-xl p-6 text-white bg-gradient-to-r from-blue-400 to-indigo-600 shadow-lg flex flex-col justify-between"
-    >
-      <div>
-        <h2 className={`text-2xl font-bold ${sourceSans.className}`}>{booking.name}</h2>
-        <p className={`text-sm mt-1 opacity-80 ${sourceSans.className}`}>Apartment: {booking.apartment}</p>
-        <p className={`text-sm mt-1 opacity-80 ${sourceSans.className}`}>Number: {booking.number}</p>
-        {booking.sport && <p className={`text-sm mt-1 opacity-80 ${sourceSans.className}`}>Sport: {booking.sport}</p>}
-        {booking.plan && <p className={`text-sm mt-1 opacity-80 ${sourceSans.className}`}>Plan: {booking.plan}</p>}
-        {booking.slot && <p className={`text-sm mt-1 opacity-80 ${sourceSans.className}`}>Slot: {booking.slot}</p>}
-        {booking.paymentStatus && (
-          <p className={`text-sm mt-2 font-semibold ${booking.paymentStatus === "pending" ? "text-yellow-300" : "text-green-300"} ${sourceSans.className}`}>
-            Payment: {booking.paymentStatus}
-          </p>
-        )}
-      </div>
+          return (
+            <motion.div
+              key={booking._id}
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 * index, duration: 0.6 }}
+              whileHover={{ scale: 1.03, rotate: 1.5, boxShadow: "0 10px 20px rgba(0,0,0,0.15)" }}
+              className={`relative rounded-xl p-6 shadow-lg flex flex-col justify-between border-l-4 ${
+                isNearExpiry ? "border-red-500 bg-gradient-to-r from-red-400 to-red-600" 
+                : "border-green-500 bg-gradient-to-r from-blue-400 to-indigo-600"
+              } text-white`}
+            >
+              {/* Expiring Soon Badge */}
+              {isNearExpiry && (
+                <span className="absolute top-2 right-2 bg-red-600 text-white text-xs font-bold px-2 py-1 rounded-full shadow-md">
+                  Expiring Soon
+                </span>
+              )}
 
-      <div className="mt-4 flex space-x-4">
-        <button
-          onClick={() => handleEdit(booking._id!)} // Non-null assertion
-          className="flex-1 px-4 py-2 rounded-lg bg-gradient-to-r from-green-400 to-teal-500 text-white font-semibold hover:from-green-500 hover:to-teal-600 transition shadow-md"
-        >
-          Edit
-        </button>
-        <button
-          onClick={() => handleDelete(booking._id!)} // Non-null assertion
-          className="flex-1 px-4 py-2 rounded-lg bg-gradient-to-r from-red-500 to-pink-500 text-white font-semibold hover:from-red-600 hover:to-pink-600 transition shadow-md"
-        >
-          Delete
-        </button>
-      </div>
-    </motion.div>
-  );
-})}
+              <div className="mb-4">
+                <h2 className={`text-2xl font-bold ${sourceSans.className}`}>{booking.name}</h2>
+                <p className={`text-sm opacity-80 ${sourceSans.className}`}>
+                  Apartment: <span className="font-semibold">{booking.apartment}</span>
+                </p>
+                <p className={`text-sm opacity-80 ${sourceSans.className}`}>
+                  Number: <span className="font-semibold">{booking.number}</span>
+                </p>
+              </div>
 
+              <div className="flex flex-col gap-2">
+                {booking.sport && <p className={`text-sm opacity-80 ${sourceSans.className}`}>Sport: <span className="font-semibold">{booking.sport}</span></p>}
+                {booking.plan && <p className={`text-sm opacity-80 ${sourceSans.className}`}>Plan: <span className="font-semibold">{booking.plan}</span></p>}
+                {booking.slot && <p className={`text-sm opacity-80 ${sourceSans.className}`}>Slot: <span className="font-semibold">{booking.slot}</span></p>}
+                {booking.price !== undefined && (
+                  <p className={`text-sm opacity-80 ${sourceSans.className}`}>Price: <span className="font-semibold">₹ {booking.price}</span></p>
+                )}
+                {booking.paymentStatus && (
+                  <p className={`text-sm font-semibold ${
+                    booking.paymentStatus === "pending" ? "text-yellow-300" : "text-green-300"
+                  } ${sourceSans.className}`}>
+                    Payment: {booking.paymentStatus}
+                  </p>
+                )}
+                {booking.expiryDate && (
+                  <p className={`text-sm font-semibold ${
+                    isNearExpiry ? "text-red-200" : "text-white"
+                  } ${sourceSans.className}`}>
+                    Days Left: {daysLeft} day{daysLeft > 1 ? "s" : ""}
+                  </p>
+                )}
+              </div>
+
+              <div className="mt-4 flex space-x-4">
+                <button
+                  onClick={() => handleEdit(booking._id!)}
+                  className="flex-1 px-4 py-2 rounded-lg bg-gradient-to-r from-green-400 to-teal-500 text-white font-semibold hover:from-green-500 hover:to-teal-600 transition shadow-md"
+                >
+                  Edit
+                </button>
+                <button
+                  onClick={() => handleDelete(booking._id!)}
+                  className="flex-1 px-4 py-2 rounded-lg bg-gradient-to-r from-red-500 to-pink-500 text-white font-semibold hover:from-red-600 hover:to-pink-600 transition shadow-md"
+                >
+                  Delete
+                </button>
+              </div>
+            </motion.div>
+          );
+        })}
       </div>
     </motion.div>
   );

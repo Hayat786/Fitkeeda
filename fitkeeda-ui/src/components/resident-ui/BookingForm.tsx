@@ -13,7 +13,12 @@ import {
   FaCheck,
 } from "react-icons/fa";
 import { useRouter } from "next/navigation";
-import { createBooking, getAllSessions, SessionData , createOrder} from "@/utils/api";
+import {
+  createBooking,
+  getAllSessions,
+  SessionData,
+  createOrder,
+} from "@/utils/api";
 import { useProspectiveClient } from "@/utils/hooks/useProspectiveClients";
 import { barlow, bebasNeue, sourceSans } from "@/fonts";
 
@@ -32,14 +37,22 @@ interface DecodedToken {
   societyName: string;
 }
 
+interface FilteredSlot {
+  plan: string;
+  slot: string;
+  price?: number;
+  months?: number; // ✅ duration
+}
+
 export default function BookingForm() {
   const router = useRouter();
   const formRef = useRef<HTMLDivElement>(null);
   const [step, setStep] = useState<number>(1);
   const [loading, setLoading] = useState<boolean>(true);
   const [sessions, setSessions] = useState<SessionData[]>([]);
-  const [filteredSlots, setFilteredSlots] = useState<string[]>([]);
+  const [filteredSlots, setFilteredSlots] = useState<FilteredSlot[]>([]);
   const [price, setPrice] = useState<number | null>(null);
+  const [duration, setDuration] = useState<number | null>(null); // ✅ duration badge
 
   const [formData, setFormData] = useState<FormData>({
     apartment: "",
@@ -93,25 +106,35 @@ export default function BookingForm() {
   // Update available slots based on sport
   useEffect(() => {
     if (formData.sport) {
-      const slots = sessions
+      const filtered = sessions
         .filter((s) => s.sport === formData.sport)
-        .map((s) => s.slot);
-      setFilteredSlots(slots);
-      if (!slots.includes(formData.slot))
+        .map((s) => ({
+          plan: s.plan,
+          slot: s.slot,
+          price: s.price,
+          months: s.months, // ✅ add duration
+        }));
+
+      setFilteredSlots(filtered);
+      if (!filtered.some((s) => s.slot === formData.slot)) {
         setFormData((prev) => ({ ...prev, slot: "" }));
+        setDuration(null);
+      }
     } else {
       setFilteredSlots([]);
       setFormData((prev) => ({ ...prev, slot: "" }));
+      setDuration(null);
     }
   }, [formData.sport, sessions]);
 
-  // Update price when sport or slot changes
+  // Update price and duration when sport or slot changes
   useEffect(() => {
-    const session = sessions.find(
-      (s) => s.sport === formData.sport && s.slot === formData.slot
+    const session = filteredSlots.find(
+      (s) => s.slot === formData.slot && s.plan
     );
     setPrice(session?.price ?? null);
-  }, [formData.sport, formData.slot, sessions]);
+    setDuration(session?.months ?? null); // ✅ update badge
+  }, [formData.slot, filteredSlots]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -135,98 +158,96 @@ export default function BookingForm() {
   };
 
   const handleSubmit = async () => {
-  try {
-    const token = localStorage.getItem("token");
-    if (!token) {
-      alert("❌ User not recognized!");
-      return;
-    }
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        alert("❌ User not recognized!");
+        return;
+      }
 
-    const decoded = jwtDecode<{ id: string }>(token);
-    if (!decoded.id) {
-      alert("❌ User ID missing in token!");
-      return;
-    }
+      const decoded = jwtDecode<{ id: string }>(token);
+      if (!decoded.id) {
+        alert("❌ User ID missing in token!");
+        return;
+      }
 
-    if (!price) {
-      alert("⚠️ Please select a valid sport and slot before proceeding.");
-      return;
-    }
+      if (!price) {
+        alert("⚠️ Please select a valid sport and slot before proceeding.");
+        return;
+      }
 
-    // 1️⃣ Create Razorpay order
-    const orderResponse = await createOrder(price);
-    const { id: orderId, amount } = orderResponse.data;
+      const orderResponse = await createOrder(price);
+      const { id: orderId, amount } = orderResponse.data;
 
-    // 2️⃣ Prepare booking payload
-    const bookingPayload = {
-  residentId: decoded.id,
-  name: formData.name,
-  number: formData.number,
-  apartment: formData.apartment,
-  sport: formData.sport,
-  slot: formData.slot,
-  price,
-};
+      const selectedSlot = filteredSlots.find(
+        (s) => s.slot === formData.slot && s.plan
+      );
 
-
-    // 3️⃣ Open Razorpay checkout
-    const options = {
-      key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
-      amount,
-      currency: "INR",
-      name: "cr4fted",
-      description: "Session Booking Payment",
-      order_id: orderId,
-      handler: async function (response: any) {
-        try {
-          // Verify payment signature
-          const verifyRes = await fetch(
-            `${process.env.NEXT_PUBLIC_API_BASE_URL}/payments/verify`,
-            {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                order_id: response.razorpay_order_id,
-                payment_id: response.razorpay_payment_id,
-                signature: response.razorpay_signature,
-              }),
-            }
-          );
-
-          const verifyData = await verifyRes.json();
-
-          if (verifyData.success) {
-            // ✅ Only create booking after verification
-            await createBooking({
-            ...bookingPayload,
-            paymentStatus: "success",
-          });
-            alert("✅ Payment Successful! Booking confirmed.");
-            router.push("/residents");
-          } else {
-            alert("❌ Payment verification failed.");
-          }
-        } catch (err) {
-          console.error(err);
-          alert("❌ Error verifying payment");
-        }
-      },
-      prefill: {
+      const bookingPayload = {
+        residentId: decoded.id,
         name: formData.name,
-        contact: formData.number,
-      },
-      theme: { color: "#10B981" },
-    };
+        number: formData.number,
+        apartment: formData.apartment,
+        sport: formData.sport,
+        slot: formData.slot,
+        plan: selectedSlot?.plan ?? "",
+        price,
+        months: selectedSlot?.months ?? 0, // ✅ send months to backend
+      };
 
-    const rzp = new (window as any).Razorpay(options);
-    rzp.open();
-  } catch (err) {
-    console.error(err);
-    alert("❌ Something went wrong during booking");
-  }
-};
+      const options = {
+        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
+        amount,
+        currency: "INR",
+        name: "cr4fted",
+        description: "Session Booking Payment",
+        order_id: orderId,
+        handler: async function (response: any) {
+          try {
+            const verifyRes = await fetch(
+              `${process.env.NEXT_PUBLIC_API_BASE_URL}/payments/verify`,
+              {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  order_id: response.razorpay_order_id,
+                  payment_id: response.razorpay_payment_id,
+                  signature: response.razorpay_signature,
+                }),
+              }
+            );
 
+            const verifyData = await verifyRes.json();
 
+            if (verifyData.success) {
+              await createBooking({
+                ...bookingPayload,
+                paymentStatus: "success",
+              });
+              alert("✅ Payment Successful! Booking confirmed.");
+              router.push("/residents");
+            } else {
+              alert("❌ Payment verification failed.");
+            }
+          } catch (err) {
+            console.error(err);
+            alert("❌ Error verifying payment");
+          }
+        },
+        prefill: {
+          name: formData.name,
+          contact: formData.number,
+        },
+        theme: { color: "#10B981" },
+      };
+
+      const rzp = new (window as any).Razorpay(options);
+      rzp.open();
+    } catch (err) {
+      console.error(err);
+      alert("❌ Something went wrong during booking");
+    }
+  };
 
   if (loading) {
     return (
@@ -240,7 +261,6 @@ export default function BookingForm() {
 
   return (
     <div className="min-h-screen lg:h-screen gradient-bg flex flex-col lg:flex-row items-center justify-center p-6 gap-8 lg:gap-12">
-      {/* Mobile Back Button */}
       <button
         onClick={() => router.push("/residents")}
         className="lg:hidden absolute top-4 left-4 text-green-500 text-2xl z-10"
@@ -363,40 +383,55 @@ export default function BookingForm() {
               Choose your sport and preferred time slot.
             </p>
             <div className="space-y-4">
-              {[
-                {
-                  name: "sport",
-                  placeholder: "Select Sport",
-                  icon: FaFutbol,
-                  options: [...new Set(sessions.map((s) => s.sport))],
-                },
-                {
-                  name: "slot",
-                  placeholder: "Select Slot",
-                  icon: FaCalendarAlt,
-                  options: filteredSlots,
-                },
-              ].map((field, idx) => {
-                const Icon = field.icon;
-                return (
-                  <div key={idx} className="relative">
-                    <Icon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" />
-                    <select
-                      name={field.name}
-                      value={formData[field.name as keyof FormData]}
-                      onChange={handleChange}
-                      className="w-full p-3 pl-10 rounded-lg bg-white text-black focus:outline-none focus:ring-2 focus:ring-green-500"
-                    >
-                      <option value="">{field.placeholder}</option>
-                      {field.options.map((opt, i) => (
-                        <option key={i} value={opt}>
-                          {opt}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                );
-              })}
+              {/* Sport selection */}
+              <div className="relative">
+                <FaFutbol className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" />
+                <select
+                  name="sport"
+                  value={formData.sport}
+                  onChange={handleChange}
+                  className="w-full p-3 pl-10 rounded-lg bg-white text-black text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-green-500"
+                >
+                  <option value="">Select Sport</option>
+                  {[...new Set(sessions.map((s) => s.sport))].map(
+                    (sport, i) => (
+                      <option key={i} value={sport}>
+                        {sport}
+                      </option>
+                    )
+                  )}
+                </select>
+              </div>
+
+              {/* Slot selection */}
+              <div className="relative">
+                <FaCalendarAlt className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" />
+                <select
+                  name="slot"
+                  value={formData.slot}
+                  onChange={handleChange}
+                  className="w-full p-3 pl-10 rounded-lg bg-white text-black text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-green-500"
+                >
+                  <option value="">Select Slot</option>
+                  {filteredSlots.map((opt, i) => (
+                    <option key={i} value={opt.slot}>
+                      Plan: {opt.plan} | Slot: {opt.slot} | Duration:{" "}
+                      {opt.months ?? "N/A"} months
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Duration Badge */}
+              {duration !== null && (
+                <motion.div
+                  initial={{ opacity: 0, y: 5 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="mt-2 p-2 bg-green-200 text-green-900 rounded-lg text-center font-semibold"
+                >
+                  Valid for {duration} {duration === 1 ? "month" : "months"}
+                </motion.div>
+              )}
 
               {/* Price Display */}
               {price !== null && (

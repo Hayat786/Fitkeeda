@@ -24,6 +24,8 @@ export default function CreateSessionPage() {
   const [selectedSport, setSelectedSport] = useState<string>("");
   const [slot, setSlot] = useState<string>("");
   const [price, setPrice] = useState<number | "">("");
+  const [plan, setPlan] = useState<string>("");
+  const [months, setMonths] = useState<number | "">(""); // ✅ New field for duration
   const [loading, setLoading] = useState<boolean>(true);
   const [submitting, setSubmitting] = useState<boolean>(false);
 
@@ -53,19 +55,28 @@ export default function CreateSessionPage() {
   }, [selectedSociety, societies]);
 
   const handleSubmit = async () => {
-    if (!selectedSociety || !selectedSport || !slot || price === "")
-      return alert("Please fill all fields including price");
+    if (
+      !selectedSociety ||
+      !selectedSport ||
+      !slot ||
+      price === "" ||
+      !plan ||
+      months === ""
+    )
+      return alert("Please fill all fields including plan, price, and months");
 
     setSubmitting(true);
     try {
       await createSession({
         apartment: selectedSociety,
         sport: selectedSport,
-        slot, // e.g. "03:00 PM"
-        price, // new field
+        slot,
+        price,
+        plan,
+        months, // ✅ included in API call
       });
       alert("Session created successfully!");
-      router.push("/admin/resident");
+      router.push("/admin/societies");
     } catch (err) {
       console.error("Failed to create session:", err);
       alert("Failed to create session");
@@ -145,6 +156,31 @@ export default function CreateSessionPage() {
             </option>
           ))}
         </select>
+
+        {/* Plan Field */}
+        <label className={`text-gray-700 font-semibold ${barlow.className}`}>
+          Plan
+        </label>
+        <input
+          type="text"
+          value={plan}
+          onChange={(e) => setPlan(e.target.value)}
+          placeholder='e.g. "Zumba + Yoga thrice a week"'
+          className="px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 transition w-full text-gray-800 font-medium"
+        />
+
+        {/* Months Field */}
+        <label className={`text-gray-700 font-semibold ${barlow.className}`}>
+          Duration (Months)
+        </label>
+        <input
+          type="number"
+          min={1}
+          value={months}
+          onChange={(e) => setMonths(Number(e.target.value))}
+          placeholder="Enter duration in months"
+          className="px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 transition w-full text-gray-800 font-medium"
+        />
 
         {/* Time Slot Picker */}
         <label className={`text-gray-700 font-semibold ${barlow.className}`}>

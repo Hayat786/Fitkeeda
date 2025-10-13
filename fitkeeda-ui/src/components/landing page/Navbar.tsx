@@ -43,7 +43,7 @@ export default function Navbar() {
               Terms
             </a>
             <a
-              href="/admin"
+              href="/admin/login"
               className="bg-blue-900 text-white px-4 py-2 rounded-lg hover:bg-blue-800 transition-colors shadow-md"
             >
               Admin Login
@@ -100,11 +100,18 @@ export default function Navbar() {
                 <a href="/gallery" className="hover:text-gray-300 transition-colors" onClick={() => setIsOpen(false)}>Gallery</a>
                 <a href="/terms" className="hover:text-gray-300 transition-colors" onClick={() => setIsOpen(false)}>Terms</a>
                 <a
-                  href="/admin"
+                  href="/admin/login"
                   className="bg-blue-900 text-white px-4 py-2 rounded-lg hover:bg-blue-800 transition-colors shadow-md"
                   onClick={() => setIsOpen(false)}
                 >
                   Admin Login
+                </a>
+                <a
+                  href="/coach/login"
+                  className="bg-green-900 text-white px-4 py-2 rounded-lg hover:bg-green-800 transition-colors shadow-md"
+                  onClick={() => setIsOpen(false)}
+                >
+                  Coach Login
                 </a>
               </nav>
             </motion.div>

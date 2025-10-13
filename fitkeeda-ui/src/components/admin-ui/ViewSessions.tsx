@@ -12,6 +12,8 @@ import {
   FaClock,
   FaUser,
   FaDumbbell,
+  FaTag,
+  FaMoneyBillWave,
 } from "react-icons/fa";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -22,7 +24,6 @@ export default function SessionsByApartment() {
   const [apartments, setApartments] = useState<string[]>([]);
   const [selectedApartment, setSelectedApartment] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(true);
-
   const [searchValue, setSearchValue] = useState<string>("");
 
   useEffect(() => {
@@ -66,7 +67,6 @@ export default function SessionsByApartment() {
     );
   });
 
-  // split into 2 groups
   const assignedSessions = filteredSessions.filter(
     (s) =>
       s.assignedCoach &&
@@ -117,9 +117,7 @@ export default function SessionsByApartment() {
               >
                 Sessions by Apartment
               </h1>
-              <p
-                className={`text-sm text-gray-600 ${sourceSans.className}`}
-              >
+              <p className={`text-sm text-gray-600 ${sourceSans.className}`}>
                 Browse sessions grouped by apartment
               </p>
             </div>
@@ -160,7 +158,8 @@ export default function SessionsByApartment() {
         </select>
       </div>
 
-{unassignedSessions.length > 0 && (
+      {/* Unassigned Sessions */}
+      {unassignedSessions.length > 0 && (
         <>
           <h2
             className={`text-xl font-bold text-red-600 mb-4 ${sourceSans.className}`}
@@ -189,10 +188,28 @@ export default function SessionsByApartment() {
                       <FaClock className="text-fuchsia-500" /> {session.slot}
                     </span>
                   </div>
+
                   <p className="text-sm text-gray-700 flex items-center gap-2 mt-3">
                     <FaMapMarkerAlt className="text-purple-400" />
                     <span className="font-medium">{session.apartment}</span>
                   </p>
+
+                  {/* NEW — Plan and Price */}
+                  <div className="mt-3 text-gray-700 text-sm flex flex-col gap-1">
+                    <div className="flex items-center gap-2">
+                      <FaTag className="text-blue-500" />
+                      Plan:{" "}
+                      <span className="font-semibold">{session.plan}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <FaMoneyBillWave className="text-green-500" />
+                      Price:{" "}
+                      <span className="font-semibold">
+                        ₹{session.price?.toLocaleString() ?? "N/A"}
+                      </span>
+                    </div>
+                  </div>
+
                   <div className="mt-4 flex items-center gap-2 text-red-600 font-semibold">
                     <FaUser className="text-red-500" />
                     Not Assigned
@@ -203,8 +220,8 @@ export default function SessionsByApartment() {
           </div>
         </>
       )}
-        
-      {/* Assigned Section */}
+
+      {/* Assigned Sessions */}
       {assignedSessions.length > 0 && (
         <>
           <h2
@@ -234,10 +251,28 @@ export default function SessionsByApartment() {
                       <FaClock className="text-fuchsia-500" /> {session.slot}
                     </span>
                   </div>
+
                   <p className="text-sm text-gray-700 flex items-center gap-2 mt-3">
                     <FaMapMarkerAlt className="text-purple-400" />
                     <span className="font-medium">{session.apartment}</span>
                   </p>
+
+                  {/* NEW — Plan and Price */}
+                  <div className="mt-3 text-gray-700 text-sm flex flex-col gap-1">
+                    <div className="flex items-center gap-2">
+                      <FaTag className="text-blue-500" />
+                      Plan:{" "}
+                      <span className="font-semibold">{session.plan}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <FaMoneyBillWave className="text-green-500" />
+                      Price:{" "}
+                      <span className="font-semibold">
+                        ₹{session.price?.toLocaleString() ?? "N/A"}
+                      </span>
+                    </div>
+                  </div>
+
                   <div className="mt-4 flex items-center gap-2 text-gray-700 font-medium">
                     <FaUser className="text-gray-500" />
                     Coach:{" "}
@@ -254,10 +289,7 @@ export default function SessionsByApartment() {
         </>
       )}
 
-      {/* Unassigned Section */}
-      
-
-      {/* If no results at all */}
+      {/* No Results */}
       {filteredSessions.length === 0 && (
         <div className="text-center mt-20">
           <Image

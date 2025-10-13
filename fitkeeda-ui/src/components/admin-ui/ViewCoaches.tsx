@@ -68,7 +68,7 @@ export default function CoachesList() {
       <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-4">
         <div className="flex items-center gap-4">
           <button
-            onClick={() => router.push("/admin")}
+            onClick={() => router.push("/admin/coaches")}
             className="p-2 rounded-full bg-white shadow-md hover:bg-gray-100 transition"
             aria-label="Back"
           >

@@ -93,14 +93,14 @@ export default function ResidentDashboard() {
   {
     title: "My Plans",
     icon: <FaClipboardList size={28} />,
-    action: () => alert("Navigating to My Plans"),
+    action: () => router.push("/residents/bookings"),
     gradient: "from-purple-400 to-pink-500",
     caption: "View all your active and past subscriptions",
   },
   {
     title: "Available Plans",
     icon: <FaClipboardList size={28} />,
-    action: () => alert("Navigating to Available Plans"),
+    action: () => router.push("/residents/plans"),
     gradient: "from-teal-400 to-green-500",
     caption: "See all monthly, quarterly, half-year, and yearly options",
   },
