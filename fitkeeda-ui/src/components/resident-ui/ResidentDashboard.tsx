@@ -76,11 +76,7 @@ export default function ResidentDashboard() {
     year: "numeric",
   });
 
-  const stats = [
-    { label: "Upcoming Bookings", value: 3, gradient: "from-blue-400 to-indigo-600" },
-    { label: "Active Plans", value: 2, gradient: "from-purple-400 to-pink-500" },
-    { label: "Payments Pending", value: "2500 Rs", gradient: "from-red-400 to-pink-600" },
-  ];
+  
 
   const cards: Card[] = [
   {
@@ -178,18 +174,7 @@ export default function ResidentDashboard() {
       </motion.div>
 
       {/* Quick Stats */}
-      <motion.div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
-        {stats.map((stat) => (
-          <motion.div
-            key={stat.label}
-            whileHover={{ scale: 1.05 }}
-            className={`rounded-xl p-4 text-white bg-gradient-to-r ${stat.gradient} shadow-lg flex flex-col items-center justify-center`}
-          >
-            <p className="text-lg font-semibold">{stat.value}</p>
-            <p className="text-sm opacity-80">{stat.label}</p>
-          </motion.div>
-        ))}
-      </motion.div>
+      
 
       {/* Cards Grid */}
       <motion.div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">

@@ -4,6 +4,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { sourceSans } from "@/fonts";
 import Image from "next/image";
+import Link from "next/link";
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -19,36 +20,47 @@ export default function Navbar() {
       >
         <div className="max-w-7xl mx-auto px-3 py-4 flex justify-between items-center">
           {/* Logo */}
-          <div className="h-16 w-32 relative">
-            <Image src="/logo.png" alt="FitKeeda Logo" fill className="object-contain" />
-          </div>
+          <Link href="/" className="h-16 w-32 relative block">
+            <Image
+              src="/logo.png"
+              alt="FitKeeda Logo"
+              fill
+              className="object-contain"
+            />
+          </Link>
 
           {/* Desktop Navigation */}
           <div
             className={`hidden md:flex gap-6 items-center text-white font-medium ${sourceSans.className}`}
           >
-            <a href="/about" className="hover:text-gray-300 transition-colors">
+            <Link href="/" className="hover:text-gray-300 transition-colors">
+              Home
+            </Link>
+            <Link href="/about" className="hover:text-gray-300 transition-colors">
               About
-            </a>
-            <a href="/auth-resident" className="hover:text-gray-300 transition-colors">
+            </Link>
+            <Link
+              href="/auth-resident"
+              className="hover:text-gray-300 transition-colors"
+            >
               Book
-            </a>
-            <a href="/coach" className="hover:text-gray-300 transition-colors">
+            </Link>
+            <Link href="/coach" className="hover:text-gray-300 transition-colors">
               Enrollment
-            </a>
-            
-            <a
+            </Link>
+
+            <Link
               href="/admin/login"
               className="bg-blue-900 text-white px-4 py-2 rounded-lg hover:bg-blue-800 transition-colors shadow-md"
             >
               Admin Login
-            </a>
-            <a
+            </Link>
+            <Link
               href="/coach/login"
               className="bg-green-900 text-white px-4 py-2 rounded-lg hover:bg-green-800 transition-colors shadow-md"
             >
               Coach Login
-            </a>
+            </Link>
           </div>
 
           {/* Mobile Menu Button */}
@@ -88,25 +100,38 @@ export default function Navbar() {
               >
                 ✕
               </button>
+
               <nav className={`flex flex-col gap-6 text-lg ${sourceSans.className}`}>
-                <a href="/about" className="hover:text-gray-300 transition-colors" onClick={() => setIsOpen(false)}>About</a>
-                <a href="/auth-resident" className="hover:text-gray-300 transition-colors" onClick={() => setIsOpen(false)}>Book</a>
-                <a href="/coach" className="hover:text-gray-300 transition-colors" onClick={() => setIsOpen(false)}>Enrollment</a>
-                
-                <a
+                {[
+                  { href: "/", label: "Home" },
+                  { href: "/about", label: "About" },
+                  { href: "/auth-resident", label: "Book" },
+                  { href: "/coach", label: "Enrollment" },
+                ].map(({ href, label }) => (
+                  <Link
+                    key={href}
+                    href={href}
+                    className="hover:text-gray-300 transition-colors"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    {label}
+                  </Link>
+                ))}
+
+                <Link
                   href="/admin/login"
                   className="bg-blue-900 text-white px-4 py-2 rounded-lg hover:bg-blue-800 transition-colors shadow-md"
                   onClick={() => setIsOpen(false)}
                 >
                   Admin Login
-                </a>
-                <a
+                </Link>
+                <Link
                   href="/coach/login"
                   className="bg-green-900 text-white px-4 py-2 rounded-lg hover:bg-green-800 transition-colors shadow-md"
                   onClick={() => setIsOpen(false)}
                 >
                   Coach Login
-                </a>
+                </Link>
               </nav>
             </motion.div>
           </>

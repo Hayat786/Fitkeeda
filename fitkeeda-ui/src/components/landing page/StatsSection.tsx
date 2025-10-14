@@ -3,13 +3,33 @@
 import { useEffect, useState, useRef } from "react";
 import { motion, useInView } from "framer-motion";
 import { bebasNeue, barlow, sourceSans } from "@/fonts";
-import { FaUsers, FaCalendarCheck, FaUserTie, FaCity } from "react-icons/fa";
+import { FaUsers, FaUserTie, FaCity, FaCalendarCheck } from "react-icons/fa";
 
 const stats = [
-  { label: "Active Users", value: 5000, icon: <FaUsers /> },
-  { label: "Sessions Booked", value: 12000, icon: <FaCalendarCheck /> },
-  { label: "Certified Coaches", value: 350, icon: <FaUserTie /> },
-  { label: "Societies Covered", value: 40, icon: <FaCity /> },
+  {
+    label: "Residents Onboarded",
+    value: 50,
+    icon: <FaUsers />,
+    description: "Actively using Fit Keeda's booking and session tracking tools.",
+  },
+  {
+    label: "Certified Coaches",
+    value: 10,
+    icon: <FaUserTie />,
+    description: "Professionals offering sessions in fitness, yoga, and sports.",
+  },
+  {
+    label: "Partnered Societies",
+    value: 2,
+    icon: <FaCity />,
+    description: "Fully integrated societies hosting daily Fit Keeda sessions.",
+  },
+  {
+    label: "Sessions Conducted",
+    value: 200,
+    icon: <FaCalendarCheck />,
+    description: "Group and personal training sessions completed to date.",
+  },
 ];
 
 export default function StatsSection() {
@@ -22,13 +42,20 @@ export default function StatsSection() {
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
           viewport={{ once: true }}
-          className={`${bebasNeue.className} text-4xl md:text-5xl text-gray-800 mb-12`}
+          className={`${bebasNeue.className} text-4xl md:text-5xl text-gray-800 mb-4`}
         >
-          Our Impact
+          Building Healthier Communities
         </motion.h2>
 
+        <p
+          className={`${sourceSans.className} text-gray-600 max-w-2xl mx-auto mb-12`}
+        >
+          Fit Keeda is growing fast - empowering residents and coaches to create
+          vibrant, health-focused communities across societies.
+        </p>
+
         {/* Stats Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
           {stats.map((stat, index) => (
             <motion.div
               key={index}
@@ -38,7 +65,7 @@ export default function StatsSection() {
               viewport={{ once: true }}
               className="bg-white shadow-md rounded-2xl p-8 flex flex-col items-center hover:shadow-xl transition-shadow duration-300"
             >
-              {/* Icon with animation */}
+              {/* Icon */}
               <motion.div
                 initial={{ scale: 0.8 }}
                 whileInView={{ scale: 1 }}
@@ -53,10 +80,13 @@ export default function StatsSection() {
 
               {/* Label */}
               <p
-                className={`${sourceSans.className} text-gray-700 mt-3 text-lg`}
+                className={`${sourceSans.className} text-gray-700 mt-3 text-lg font-semibold`}
               >
                 {stat.label}
               </p>
+
+              {/* Description */}
+              <p className="text-gray-500 text-sm mt-2">{stat.description}</p>
             </motion.div>
           ))}
         </div>
@@ -76,8 +106,8 @@ function AnimatedNumber({ value }: { value: number }) {
 
     let start = 0;
     const end = value;
-    const duration = 2000; // 2 seconds
-    const increment = end / (duration / 16); // Approx 60fps
+    const duration = 1500;
+    const increment = end / (duration / 16);
 
     const animate = () => {
       start += increment;

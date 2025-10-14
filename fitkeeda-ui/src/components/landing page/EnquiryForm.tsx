@@ -30,7 +30,7 @@ export default function EnquiryForm() {
 </motion.p>
 
 
-        {/* Form */}
+        {/* Form
         <motion.form
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -66,7 +66,7 @@ export default function EnquiryForm() {
           >
             Submit Enquiry
           </motion.button>
-        </motion.form>
+        </motion.form> */}
       </div>
     </section>
   );
