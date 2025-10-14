@@ -282,11 +282,7 @@ export const loginCoach = (data: CoachAuthData) =>
 
 // Verify coach JWT token
 export const verifyCoachToken = (token: string) =>
-  api.get("/coach-auth/verify", {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
+  api.post("/coach-auth/verify", { token });
 
 
 // ===================== Attendance APIs =====================

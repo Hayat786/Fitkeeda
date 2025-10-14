@@ -36,12 +36,7 @@ export default function Navbar() {
             <a href="/coach" className="hover:text-gray-300 transition-colors">
               Enrollment
             </a>
-            <a href="/gallery" className="hover:text-gray-300 transition-colors">
-              Gallery
-            </a>
-            <a href="/terms" className="hover:text-gray-300 transition-colors">
-              Terms
-            </a>
+            
             <a
               href="/admin/login"
               className="bg-blue-900 text-white px-4 py-2 rounded-lg hover:bg-blue-800 transition-colors shadow-md"
@@ -97,8 +92,7 @@ export default function Navbar() {
                 <a href="/about" className="hover:text-gray-300 transition-colors" onClick={() => setIsOpen(false)}>About</a>
                 <a href="/auth-resident" className="hover:text-gray-300 transition-colors" onClick={() => setIsOpen(false)}>Book</a>
                 <a href="/coach" className="hover:text-gray-300 transition-colors" onClick={() => setIsOpen(false)}>Enrollment</a>
-                <a href="/gallery" className="hover:text-gray-300 transition-colors" onClick={() => setIsOpen(false)}>Gallery</a>
-                <a href="/terms" className="hover:text-gray-300 transition-colors" onClick={() => setIsOpen(false)}>Terms</a>
+                
                 <a
                   href="/admin/login"
                   className="bg-blue-900 text-white px-4 py-2 rounded-lg hover:bg-blue-800 transition-colors shadow-md"
