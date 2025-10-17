@@ -69,8 +69,8 @@ export default function ResidentFunctions() {
       title: "Payment Logs",
       icon: <FaMoneyCheckAlt size={28} />,
       caption: "View all transactions made by customers",
-      gradient: "from-indigo-400 to-blue-500",
-      action: () => router.push("/payment-logs-placeholder"),
+      gradient: "from-gray-300 to-gray-400",
+      action: () => alert("Payments section is under development"),
     },
     
   ];

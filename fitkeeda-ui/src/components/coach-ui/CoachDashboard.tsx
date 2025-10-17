@@ -108,8 +108,8 @@ export default function CoachDashboard() {
     {
       title: "Payment Logs",
       icon: <FaWallet size={28} />,
-      action: () => router.push("/coach/payments"),
-      gradient: "from-red-400 to-pink-600",
+      gradient: "from-gray-300 to-gray-400",
+      action: () => alert("Payments section is under development"),
       caption: "Check all past and pending payment records",
     },
   ];
@@ -158,14 +158,9 @@ export default function CoachDashboard() {
   </div>
 
   {/* Notifications */}
-  <div className="relative cursor-pointer">
-    <FaBell size={28} className="text-blue-600" />
-    {notifications > 0 && (
-      <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-        {notifications}
-      </span>
-    )}
-  </div>
+  {/* Right section intentionally left empty for now */}
+<div></div>
+
 </motion.div>
 
 

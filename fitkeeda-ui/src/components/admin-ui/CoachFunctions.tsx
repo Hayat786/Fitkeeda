@@ -52,8 +52,8 @@ export default function CoachFunctions() {
       title: "Payment Logs",
       icon: <MdPayment size={28} />,
       caption: "View coach payments",
-      gradient: "from-red-400 to-pink-600",
-      action: () => router.push("/admin/coaches/payments"), // ✅ Placeholder route
+      gradient: "from-gray-300 to-gray-400",
+      action: () => alert("Payments section is under development"), // ✅ Placeholder route
     },
   ];
 

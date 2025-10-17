@@ -90,6 +90,20 @@ export const updateCoach = (id: string, data: Partial<CoachData>) =>
   api.put(`/coaches/${id}`, data);
 
 // ===================== Sessions APIs =====================
+
+
+// -----------------------------
+// Session Type Definition
+// -----------------------------
+export interface AssignedCoach {
+  coach: {
+    _id: string;
+    name: string;
+    email: string;
+  };
+  days: string[]; // e.g. ["monday", "tuesday"]
+}
+
 export interface SessionData {
   _id?: string;
   apartment: string;
@@ -98,15 +112,38 @@ export interface SessionData {
   months: number;
   slot: string;
   price?: number;
-  assignedCoach?: null | { _id: string; name: string; email: string };
+  assignedCoaches?: AssignedCoach[]; // updated to support multiple coaches
 }
 
+// -----------------------------
+// API Methods
+// -----------------------------
+
+// ✅ Create a new session
 export const createSession = (data: SessionData) => api.post("/sessions", data);
 
+// ✅ Get all sessions (with populated coaches)
 export const getAllSessions = () => api.get<SessionData[]>("/sessions");
 
-export const assignCoachToSession = (sessionId: string, coachId: string) =>
-  api.patch(`/sessions/${sessionId}/assign-coach`, { coachId });
+// ✅ Assign multiple coaches (with their days) to a session
+// Example payload:
+// assignCoachesToSession("sessionId123", [
+//   { coachId: "coachA", days: ["monday", "tuesday", "wednesday"] },
+//   { coachId: "coachB", days: ["thursday", "friday"] },
+// ]);
+// api.ts
+export const assignCoachesToSession = async (
+  sessionId: string,
+  payload: { assignments: { coachId: string; days: string[] }[] }
+) => {
+  const res = await api.patch(`/sessions/${sessionId}/assign-coaches`, payload, {
+    headers: { "Content-Type": "application/json" },
+  });
+  return res.data;
+};
+
+
+
 
 // ===================== Bookings APIs =====================
 export interface BookingData {

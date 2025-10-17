@@ -15,7 +15,7 @@ import {
 } from "react-icons/fa";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { jwtDecode } from "jwt-decode";
+import {jwtDecode} from "jwt-decode";
 
 interface DecodedToken {
   phone: string;
@@ -41,12 +41,13 @@ export default function CoachSessionsPage() {
     try {
       const token = localStorage.getItem("coach_token");
       if (!token) {
-        router.push("/login"); // or wherever
+        router.push("/login");
         return;
       }
 
       const decoded = jwtDecode<DecodedToken>(token);
-      // get coach _id
+
+      // Get coach _id
       const coachesRes = await getAllCoaches();
       const coaches: CoachData[] = coachesRes.data;
       const coach = coaches.find(c => c.phone.trim() === decoded.phone.trim());
@@ -57,15 +58,16 @@ export default function CoachSessionsPage() {
       }
       setCoachId(coach._id!);
 
-      // get sessions assigned to this coach
+      // Get sessions assigned to this coach
       const sessionsRes = await getAllSessions();
       const allSessions: SessionData[] = sessionsRes.data;
+
       const coachSessions = allSessions.filter(
-        s => s.assignedCoach?._id === coach._id
+        s => s.assignedCoaches?.some(c => c.coach._id === coach._id)
       );
       setSessions(coachSessions);
 
-      // extract unique apartments
+      // Extract unique apartments
       const uniqueApts = [...new Set(coachSessions.map(s => s.apartment))];
       setApartments(uniqueApts);
 
@@ -82,41 +84,16 @@ export default function CoachSessionsPage() {
     const q = searchValue.trim().toLowerCase();
     if (!q) return true;
 
-    const coachName =
-      s.assignedCoach &&
-      typeof s.assignedCoach === "object" &&
-      "name" in s.assignedCoach &&
-      s.assignedCoach.name
-        ? String((s.assignedCoach as { name?: string }).name).toLowerCase()
-        : "";
-
     return (
       s.sport.toLowerCase().includes(q) ||
-      s.apartment.toLowerCase().includes(q) ||
-      s.slot.toLowerCase().includes(q) ||
-      coachName.includes(q)
+      s.apartment.toLowerCase().includes(q)
     );
   });
-
-  const assignedSessions = filteredSessions.filter(
-    (s) =>
-      s.assignedCoach &&
-      typeof s.assignedCoach === "object" &&
-      "name" in s.assignedCoach
-  );
-
-  const unassignedSessions = filteredSessions.filter(
-    (s) =>
-      !s.assignedCoach ||
-      !(typeof s.assignedCoach === "object" && "name" in s.assignedCoach)
-  );
 
   if (loading) {
     return (
       <div className="flex items-center justify-center h-screen gradient-bg animate-pulse">
-        <p
-          className={`text-2xl font-semibold text-gray-700 ${sourceSans.className}`}
-        >
+        <p className={`text-2xl font-semibold text-gray-700 ${sourceSans.className}`}>
           Loading Sessions...
         </p>
       </div>
@@ -144,14 +121,10 @@ export default function CoachSessionsPage() {
           <div className="flex items-center gap-3">
             <Image src="/logo.png" alt="Logo" width={56} height={56} />
             <div>
-              <h1
-                className={`text-2xl md:text-3xl font-bold text-gray-800 ${bebasNeue.className}`}
-              >
+              <h1 className={`text-2xl md:text-3xl font-bold text-gray-800 ${bebasNeue.className}`}>
                 Your Sessions
               </h1>
-              <p
-                className={`text-sm text-gray-600 ${sourceSans.className}`}
-              >
+              <p className={`text-sm text-gray-600 ${sourceSans.className}`}>
                 Browse sessions assigned to you
               </p>
             </div>
@@ -166,7 +139,7 @@ export default function CoachSessionsPage() {
               aria-label="Search sessions"
               value={searchValue}
               onChange={(e) => setSearchValue(e.target.value)}
-              placeholder="Search by sport, apartment, coach, or slot..."
+              placeholder="Search by sport, apartment, or slot..."
               className="w-full pl-10 p-3 rounded-lg bg-white text-gray-900 placeholder-gray-400 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500 shadow-sm"
             />
           </div>
@@ -192,16 +165,11 @@ export default function CoachSessionsPage() {
         </select>
       </div>
 
-      {/* Assigned Section */}
-      {assignedSessions.length > 0 ? (
-        <>
-          <h2
-            className={`text-xl font-bold text-green-700 mb-4 ${sourceSans.className}`}
-          >
-            Assigned Sessions
-          </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
-            {assignedSessions.map((session, index) => (
+      {filteredSessions.length > 0 ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
+          {filteredSessions.map((session, index) => {
+            const coachInfo = session.assignedCoaches?.find(c => c.coach._id === coachId);
+            return (
               <motion.div
                 key={session._id || index}
                 initial={{ opacity: 0, y: 30 }}
@@ -212,9 +180,7 @@ export default function CoachSessionsPage() {
               >
                 <div className="p-5">
                   <div className="flex items-center justify-between">
-                    <h2
-                      className={`text-lg font-semibold text-gray-800 ${sourceSans.className}`}
-                    >
+                    <h2 className={`text-lg font-semibold text-gray-800 ${sourceSans.className}`}>
                       <FaDumbbell className="inline text-purple-500 mr-2" />
                       {session.sport}
                     </h2>
@@ -226,18 +192,22 @@ export default function CoachSessionsPage() {
                     <FaMapMarkerAlt className="text-purple-400" />
                     <span className="font-medium">{session.apartment}</span>
                   </p>
-                  <div className="mt-4 flex items-center gap-2 text-gray-700 font-medium">
-                    <FaUser className="text-gray-500" />
-                    Coach:{" "}
-                    <span className="text-gray-900 font-semibold">
-                      {String((session.assignedCoach as { name?: string }).name)}
-                    </span>
-                  </div>
+
+                  {coachInfo ? (
+                    <div className="mt-4 flex items-center gap-2 text-gray-700 font-medium">
+                      <FaUser className="text-gray-500" />
+                      Coach assigned on: <span className="text-gray-900 font-semibold">{coachInfo.days.join(", ")}</span>
+                    </div>
+                  ) : (
+                    <div className="mt-4 flex items-center gap-2 text-red-600 font-semibold">
+                      <FaUser className="text-red-500" /> Not Assigned
+                    </div>
+                  )}
                 </div>
               </motion.div>
-            ))}
-          </div>
-        </>
+            );
+          })}
+        </div>
       ) : (
         <div className="text-center mt-20">
           <Image

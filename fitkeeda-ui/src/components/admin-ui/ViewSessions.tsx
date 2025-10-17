@@ -51,40 +51,25 @@ export default function SessionsByApartment() {
     const q = searchValue.trim().toLowerCase();
     if (!q) return true;
 
-    const coachName =
-      s.assignedCoach &&
-      typeof s.assignedCoach === "object" &&
-      "name" in s.assignedCoach &&
-      s.assignedCoach.name
-        ? String((s.assignedCoach as { name?: string }).name).toLowerCase()
-        : "";
+    // Search across sport, apartment, slot, or any assigned coach
+    const coachesNames =
+      s.assignedCoaches?.map((c) => c.coach.name.toLowerCase()).join(",") ?? "";
 
     return (
       s.sport.toLowerCase().includes(q) ||
       s.apartment.toLowerCase().includes(q) ||
       s.slot.toLowerCase().includes(q) ||
-      coachName.includes(q)
+      coachesNames.includes(q)
     );
   });
 
-  const assignedSessions = filteredSessions.filter(
-    (s) =>
-      s.assignedCoach &&
-      typeof s.assignedCoach === "object" &&
-      "name" in s.assignedCoach
-  );
-  const unassignedSessions = filteredSessions.filter(
-    (s) =>
-      !s.assignedCoach ||
-      !(typeof s.assignedCoach === "object" && "name" in s.assignedCoach)
-  );
+  const assignedSessions = filteredSessions.filter((s) => s.assignedCoaches?.length);
+  const unassignedSessions = filteredSessions.filter((s) => !s.assignedCoaches?.length);
 
   if (loading) {
     return (
       <div className="flex items-center justify-center h-screen gradient-bg animate-pulse">
-        <p
-          className={`text-2xl font-semibold text-gray-700 ${sourceSans.className}`}
-        >
+        <p className={`text-2xl font-semibold text-gray-700 ${sourceSans.className}`}>
           Loading Sessions...
         </p>
       </div>
@@ -112,9 +97,7 @@ export default function SessionsByApartment() {
           <div className="flex items-center gap-3">
             <Image src="/logo.png" alt="Logo" width={56} height={56} />
             <div>
-              <h1
-                className={`text-2xl md:text-3xl font-bold text-gray-800 ${bebasNeue.className}`}
-              >
+              <h1 className={`text-2xl md:text-3xl font-bold text-gray-800 ${bebasNeue.className}`}>
                 Sessions by Apartment
               </h1>
               <p className={`text-sm text-gray-600 ${sourceSans.className}`}>
@@ -161,9 +144,7 @@ export default function SessionsByApartment() {
       {/* Unassigned Sessions */}
       {unassignedSessions.length > 0 && (
         <>
-          <h2
-            className={`text-xl font-bold text-red-600 mb-4 ${sourceSans.className}`}
-          >
+          <h2 className={`text-xl font-bold text-red-600 mb-4 ${sourceSans.className}`}>
             Unassigned Sessions
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
@@ -178,9 +159,7 @@ export default function SessionsByApartment() {
               >
                 <div className="p-5">
                   <div className="flex items-center justify-between">
-                    <h2
-                      className={`text-lg font-semibold text-gray-800 ${sourceSans.className}`}
-                    >
+                    <h2 className={`text-lg font-semibold text-gray-800 ${sourceSans.className}`}>
                       <FaDumbbell className="inline text-purple-500 mr-2" />
                       {session.sport}
                     </h2>
@@ -194,25 +173,20 @@ export default function SessionsByApartment() {
                     <span className="font-medium">{session.apartment}</span>
                   </p>
 
-                  {/* NEW — Plan and Price */}
                   <div className="mt-3 text-gray-700 text-sm flex flex-col gap-1">
                     <div className="flex items-center gap-2">
                       <FaTag className="text-blue-500" />
-                      Plan:{" "}
-                      <span className="font-semibold">{session.plan}</span>
+                      Plan: <span className="font-semibold">{session.plan}</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <FaMoneyBillWave className="text-green-500" />
-                      Price:{" "}
-                      <span className="font-semibold">
-                        ₹{session.price?.toLocaleString() ?? "N/A"}
-                      </span>
+                      Price: <span className="font-semibold">₹{session.price?.toLocaleString() ?? "N/A"}</span>
                     </div>
                   </div>
 
-                  <div className="mt-4 flex items-center gap-2 text-red-600 font-semibold">
+                  <div className="mt-4 flex flex-col gap-1 text-red-600 font-semibold">
                     <FaUser className="text-red-500" />
-                    Not Assigned
+                    <span>Not Assigned</span>
                   </div>
                 </div>
               </motion.div>
@@ -224,9 +198,7 @@ export default function SessionsByApartment() {
       {/* Assigned Sessions */}
       {assignedSessions.length > 0 && (
         <>
-          <h2
-            className={`text-xl font-bold text-green-700 mb-4 ${sourceSans.className}`}
-          >
+          <h2 className={`text-xl font-bold text-green-700 mb-4 ${sourceSans.className}`}>
             Assigned Sessions
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
@@ -241,9 +213,7 @@ export default function SessionsByApartment() {
               >
                 <div className="p-5">
                   <div className="flex items-center justify-between">
-                    <h2
-                      className={`text-lg font-semibold text-gray-800 ${sourceSans.className}`}
-                    >
+                    <h2 className={`text-lg font-semibold text-gray-800 ${sourceSans.className}`}>
                       <FaDumbbell className="inline text-purple-500 mr-2" />
                       {session.sport}
                     </h2>
@@ -257,30 +227,27 @@ export default function SessionsByApartment() {
                     <span className="font-medium">{session.apartment}</span>
                   </p>
 
-                  {/* NEW — Plan and Price */}
                   <div className="mt-3 text-gray-700 text-sm flex flex-col gap-1">
                     <div className="flex items-center gap-2">
                       <FaTag className="text-blue-500" />
-                      Plan:{" "}
-                      <span className="font-semibold">{session.plan}</span>
+                      Plan: <span className="font-semibold">{session.plan}</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <FaMoneyBillWave className="text-green-500" />
-                      Price:{" "}
-                      <span className="font-semibold">
-                        ₹{session.price?.toLocaleString() ?? "N/A"}
-                      </span>
+                      Price: <span className="font-semibold">₹{session.price?.toLocaleString() ?? "N/A"}</span>
                     </div>
                   </div>
 
-                  <div className="mt-4 flex items-center gap-2 text-gray-700 font-medium">
-                    <FaUser className="text-gray-500" />
-                    Coach:{" "}
-                    <span className="text-gray-900 font-semibold">
-                      {String(
-                        (session.assignedCoach as { name?: string }).name
-                      )}
-                    </span>
+                  {/* NEW — Display multiple assigned coaches */}
+                  <div className="mt-4 flex flex-col gap-2 text-gray-700 font-medium">
+                    {session.assignedCoaches?.map((c) => (
+                      <div key={c.coach._id} className="flex items-center gap-2">
+                        <FaUser className="text-gray-500" />
+                        <span>
+                          {c.coach.name} ({c.days.join(", ")})
+                        </span>
+                      </div>
+                    ))}
                   </div>
                 </div>
               </motion.div>

@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useEffect, useState } from "react";
@@ -61,9 +60,7 @@ export default function SessionsByUserApartment() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-screen gradient-bg animate-pulse">
-        <p
-          className={`text-2xl font-semibold text-gray-700 ${sourceSans.className}`}
-        >
+        <p className={`text-2xl font-semibold text-gray-700 ${sourceSans.className}`}>
           Loading Sessions...
         </p>
       </div>
@@ -139,10 +136,16 @@ export default function SessionsByUserApartment() {
                 </div>
 
                 {/* Coach Info */}
-                {session.assignedCoach && (session.assignedCoach as { name?: string }).name ? (
-                  <div className="mt-4 flex items-center gap-2 text-gray-700 font-medium">
-                    <FaUser className="text-gray-500" />
-                    Coach: <span className="text-gray-900 font-semibold">{(session.assignedCoach as { name?: string }).name}</span>
+                {session.assignedCoaches?.length ? (
+                  <div className="mt-4 flex flex-col gap-2 text-gray-700 font-medium">
+                    {session.assignedCoaches.map((c) => (
+                      <div key={c.coach._id} className="flex items-center gap-2">
+                        <FaUser className="text-gray-500" />
+                        <span>
+                          {c.coach.name} ({c.days.join(", ")})
+                        </span>
+                      </div>
+                    ))}
                   </div>
                 ) : (
                   <div className="mt-4 flex items-center gap-2 text-red-600 font-semibold">

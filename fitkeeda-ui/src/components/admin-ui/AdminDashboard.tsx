@@ -5,7 +5,6 @@ import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import {
   FaArrowLeft,
-  FaBell,
   FaMailBulk,
   FaClipboardList,
   FaBookOpen,
@@ -27,7 +26,6 @@ interface NavCardProps {
 export default function AdminDashboard() {
   const router = useRouter();
   const [today, setToday] = useState("");
-  const [notifications] = useState<number>(3);
   const [stats, setStats] = useState({
     bookingsToday: 0,
     sessionsNeedingCoach: 0,
@@ -180,14 +178,6 @@ export default function AdminDashboard() {
               {today}
             </p>
           </div>
-        </div>
-        <div className="relative cursor-pointer">
-          <FaBell size={28} className="text-blue-600" />
-          {notifications > 0 && (
-            <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-              {notifications}
-            </span>
-          )}
         </div>
       </motion.div>
 

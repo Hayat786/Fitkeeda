@@ -6,12 +6,9 @@ import { motion } from "framer-motion";
 import {
   FaCalendarAlt,
   FaClipboardList,
-  FaSwimmer,
-  FaArrowLeft,
   FaWallet,
-  FaUserCircle,
   FaEnvelope,
-  FaBell,
+  FaArrowLeft,
 } from "react-icons/fa";
 import { barlow, bebasNeue, sourceSans } from "@/fonts";
 import { jwtDecode } from "jwt-decode";
@@ -38,12 +35,12 @@ interface Card {
   action: () => void;
   gradient: string;
   caption: string;
+  inactive?: boolean;
 }
 
 export default function ResidentDashboard() {
   const [resident, setResident] = useState<Resident | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
-  const [notifications] = useState<number>(5);
   const router = useRouter();
 
   useEffect(() => {
@@ -76,58 +73,58 @@ export default function ResidentDashboard() {
     year: "numeric",
   });
 
-  
-
   const cards: Card[] = [
-  {
-    title: "Book a Plan",
-    icon: <FaCalendarAlt size={28} />,
-    action: () => router.push("/residents/booking-form"),
-    gradient: "from-blue-400 to-indigo-600",
-    caption: "Reserve your preferred subscription quickly",
-  },
-  {
-    title: "My Plans",
-    icon: <FaClipboardList size={28} />,
-    action: () => router.push("/residents/bookings"),
-    gradient: "from-purple-400 to-pink-500",
-    caption: "View all your active and past subscriptions",
-  },
-  {
-    title: "Available Plans",
-    icon: <FaClipboardList size={28} />,
-    action: () => router.push("/residents/plans"),
-    gradient: "from-teal-400 to-green-500",
-    caption: "See all monthly, quarterly, half-year, and yearly options",
-  },
-  {
-    title: "Payments",
-    icon: <FaWallet size={28} />,
-    action: () => alert("Navigating to Payments"),
-    gradient: "from-red-400 to-pink-600",
-    caption: "Check pending or completed payment logs",
-  },
-  {
-    title: "Enquiries",
-    icon: <FaEnvelope size={28} />,
-    action: () => router.push("/residents/enquiry"), 
-    gradient: "from-yellow-400 to-orange-500",
-    caption: "Send your queries directly to business managers",
-  },
-  {
-    title: "Admin Notices",
-    icon: <FaEnvelope size={28} />,
-    action: () => router.push("/residents/notice"), 
-    gradient: "from-gray-400 to-gray-600",
-    caption: "View all notices shared by your admin",
-  },
-];
-
+    {
+      title: "Book a Plan",
+      icon: <FaCalendarAlt size={28} />,
+      action: () => router.push("/residents/booking-form"),
+      gradient: "from-blue-400 to-indigo-600",
+      caption: "Reserve your preferred subscription quickly",
+    },
+    {
+      title: "My Plans",
+      icon: <FaClipboardList size={28} />,
+      action: () => router.push("/residents/bookings"),
+      gradient: "from-purple-400 to-pink-500",
+      caption: "View all your active and past subscriptions",
+    },
+    {
+      title: "Available Plans",
+      icon: <FaClipboardList size={28} />,
+      action: () => router.push("/residents/plans"),
+      gradient: "from-teal-400 to-green-500",
+      caption: "See all monthly, quarterly, half-year, and yearly options",
+    },
+    {
+      title: "Payments",
+      icon: <FaWallet size={28} />,
+      action: () => alert("Payments section is under development"),
+      gradient: "from-gray-300 to-gray-400", // Dull gradient
+      caption: "Check pending or completed payment logs",
+      inactive: true,
+    },
+    {
+      title: "Enquiries",
+      icon: <FaEnvelope size={28} />,
+      action: () => router.push("/residents/enquiry"),
+      gradient: "from-yellow-400 to-orange-500",
+      caption: "Send your queries directly to business managers",
+    },
+    {
+      title: "Admin Notices",
+      icon: <FaEnvelope size={28} />,
+      action: () => router.push("/residents/notice"),
+      gradient: "from-gray-400 to-gray-600",
+      caption: "View all notices shared by your admin",
+    },
+  ];
 
   if (loading) {
     return (
       <div className="flex items-center justify-center h-screen bg-gradient-to-r from-blue-50 to-purple-50 animate-pulse">
-        <p className={`text-2xl font-semibold text-gray-700 ${sourceSans.className}`}>
+        <p
+          className={`text-2xl font-semibold text-gray-700 ${sourceSans.className}`}
+        >
           Loading Dashboard...
         </p>
       </div>
@@ -141,40 +138,34 @@ export default function ResidentDashboard() {
       animate={{ opacity: 1 }}
       transition={{ duration: 0.8 }}
     >
-
       {/* Back Button */}
-<div className="mb-4">
-  <button
-    onClick={() => router.push("/")}
-    className="flex items-center gap-2 px-3 py-2 rounded-lg bg-white shadow-md hover:bg-gray-100 transition text-gray-800 font-semibold"
-  >
-    <FaArrowLeft />
-    Back
-  </button>
-</div>
+      <div className="mb-4">
+        <button
+          onClick={() => router.push("/")}
+          className="flex items-center gap-2 px-3 py-2 rounded-lg bg-white shadow-md hover:bg-gray-100 transition text-gray-800 font-semibold"
+        >
+          <FaArrowLeft />
+          Back
+        </button>
+      </div>
 
-      {/* Header with notifications */}
+      {/* Header (Bell removed) */}
       <motion.div className="mb-8 flex items-center justify-between">
         <div>
-          <h1 className={`text-4xl md:text-5xl font-bold text-gray-800 ${bebasNeue.className}`}>
+          <h1
+            className={`text-4xl md:text-5xl font-bold text-gray-800 ${bebasNeue.className}`}
+          >
             Welcome, {resident?.fullName}!
           </h1>
           <p className={`text-xl text-gray-600 ${barlow.className}`}>
-            Society: <span className="font-semibold">{resident?.societyName}</span> | {formattedDate}
+            Society:{" "}
+            <span className="font-semibold">{resident?.societyName}</span> |{" "}
+            {formattedDate}
           </p>
         </div>
-        <div className="relative cursor-pointer">
-          <FaBell size={28} className="text-blue-600" />
-          {notifications > 0 && (
-            <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-              {notifications}
-            </span>
-          )}
-        </div>
+        {/* Empty spacer keeps layout intact */}
+        <div className="w-[28px]" />
       </motion.div>
-
-      {/* Quick Stats */}
-      
 
       {/* Cards Grid */}
       <motion.div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -184,14 +175,26 @@ export default function ResidentDashboard() {
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 * index, duration: 0.6 }}
-            whileHover={{ scale: 1.05, rotate: 2, boxShadow: "0 10px 20px rgba(0,0,0,0.2)" }}
-            onClick={card.action}
-            className={`cursor-pointer rounded-xl p-6 flex flex-col items-start justify-start text-white bg-gradient-to-r ${card.gradient} shadow-lg`}
+            whileHover={
+              card.inactive
+                ? {}
+                : {
+                    scale: 1.05,
+                    rotate: 2,
+                    boxShadow: "0 10px 20px rgba(0,0,0,0.2)",
+                  }
+            }
+            onClick={!card.inactive ? card.action : undefined}
+            className={`cursor-pointer rounded-xl p-6 flex flex-col items-start justify-start text-white bg-gradient-to-r ${card.gradient} shadow-lg ${
+              card.inactive ? "opacity-60 cursor-not-allowed" : ""
+            }`}
           >
-            <motion.div whileHover={{ rotate: 20 }} className="mb-4">
+            <motion.div whileHover={{ rotate: card.inactive ? 0 : 20 }} className="mb-4">
               {card.icon}
             </motion.div>
-            <h2 className={`text-2xl font-bold ${sourceSans.className}`}>{card.title}</h2>
+            <h2 className={`text-2xl font-bold ${sourceSans.className}`}>
+              {card.title}
+            </h2>
             <motion.p
               className="text-sm mt-2 opacity-80"
               initial={{ opacity: 0, y: 10 }}

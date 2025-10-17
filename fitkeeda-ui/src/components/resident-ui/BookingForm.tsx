@@ -199,7 +199,7 @@ export default function BookingForm() {
         key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
         amount,
         currency: "INR",
-        name: "cr4fted",
+        name: "Fit Keeda",
         description: "Session Booking Payment",
         order_id: orderId,
         handler: async function (response: any) {
