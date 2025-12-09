@@ -1,6 +1,7 @@
 import axios from "axios";
 
-const API_BASE_URL = "https://fitkeeda-nest.onrender.com"; // change to your backend URL
+/* const API_BASE_URL = "https://fitkeeda-nest.onrender.com"; */ // change to your backend URL
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -77,7 +78,7 @@ export interface CoachData {
   email: string;
   phone: string;
   location: string;
-  password?:string;
+  password?: string;
   sessions?: string[]; // Optional
   sports?: string[];   // ✅ specialization
 }
