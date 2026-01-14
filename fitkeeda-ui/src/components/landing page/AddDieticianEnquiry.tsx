@@ -17,6 +17,7 @@ import {
 import Image from "next/image";
 import { bebasNeue, barlow } from "@/fonts";
 import { useRouter } from "next/navigation";
+import { GiPanda } from "react-icons/gi";
 
 export default function DieticianEnquiryForm() {
     const router = useRouter();
@@ -186,8 +187,8 @@ export default function DieticianEnquiryForm() {
                 {/* Step 0 */}
                 {step === 0 && (
                     <div className="space-y-6">
-                        <h2 className="text-2xl lg:text-3xl font-bold text-center flex items-center justify-center gap-2">
-                            <FaUser className="text-blue-600" /> Basic Info
+                        <h2 className="text-2xl lg:text-3xl font-bold text-gray-800 text-center flex items-center justify-center gap-2">
+                            <GiPanda className="text-blue-600" /> Basic Info
                         </h2>
 
                         <Input icon={<FaUser />} placeholder="Full Name" value={form.dieticianName}
@@ -285,9 +286,11 @@ export default function DieticianEnquiryForm() {
 /* helpers */
 const Input = ({ icon, placeholder, value, onChange }: any) => (
     <div className="relative">
-        <span className="absolute left-3 top-1/2 -translate-y-1/2">{icon}</span>
+        {/* Icon color changed to dark gray */}
+        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-600">{icon}</span>
         <input
-            className="w-full p-3 pl-10 rounded-lg border border-gray-400 focus:ring-2 focus:ring-blue-600 bg-white"
+            // Added: bg-gray-50, text-black, placeholder-gray-600
+            className="w-full p-3 pl-10 rounded-lg border border-gray-400 focus:ring-2 focus:ring-blue-600 bg-gray-50 text-black placeholder-gray-600"
             placeholder={placeholder}
             value={value}
             onChange={(e) => onChange(e.target.value)}
@@ -296,7 +299,8 @@ const Input = ({ icon, placeholder, value, onChange }: any) => (
 );
 
 const Confirm = ({ label, value }: any) => (
-    <div className="bg-white p-4 rounded-lg border border-blue-300 shadow-sm">
-        <b>{label}:</b> {value}
+    // Added: text-black to ensure confirmation text is also visible
+    <div className="bg-white p-4 rounded-lg border border-blue-300 shadow-sm text-black">
+        <b className="text-blue-900">{label}:</b> {value}
     </div>
 );
