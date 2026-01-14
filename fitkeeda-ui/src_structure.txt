@@ -1,0 +1,188 @@
+Folder PATH listing
+Volume serial number is A4C2-5EDE
+C:\USERS\HAYAT\DESKTOP\FITKEEDA\FITKEEDA-UI\SRC
+|   fonts.tsx
+|   
++---app
+|   |   favicon.ico
+|   |   globals.css
+|   |   layout.tsx
+|   |   page.tsx
+|   |   razorpay-loader.tsx
+|   |   
+|   +---about
+|   |       page.tsx
+|   |       
+|   +---admin
+|   |   |   layout.tsx
+|   |   |   page.tsx
+|   |   |   
+|   |   +---booking
+|   |   |       page.tsx
+|   |   |       
+|   |   +---coaches
+|   |   |   |   page.tsx
+|   |   |   |   
+|   |   |   +---assign
+|   |   |   |       page.tsx
+|   |   |   |       
+|   |   |   +---attendance
+|   |   |   |       page.tsx
+|   |   |   |       
+|   |   |   +---new
+|   |   |   |       page.tsx
+|   |   |   |       
+|   |   |   +---profiles
+|   |   |   |       page.tsx
+|   |   |   |       
+|   |   |   \---schedule
+|   |   |           page.tsx
+|   |   |           
+|   |   +---dieticians
+|   |   |   |   page.tsx
+|   |   |   |   
+|   |   |   +---all
+|   |   |   |       page.tsx
+|   |   |   |       
+|   |   |   \---new
+|   |   |           page.tsx
+|   |   |           
+|   |   +---enquiries
+|   |   |       page.tsx
+|   |   |       
+|   |   +---login
+|   |   |       page.tsx
+|   |   |       
+|   |   +---resident
+|   |   |   |   page.tsx
+|   |   |   |   
+|   |   |   +---bookings
+|   |   |   |       page.tsx
+|   |   |   |       
+|   |   |   +---enquiries
+|   |   |   |       page.tsx
+|   |   |   |       
+|   |   |   +---notice
+|   |   |   |       page.tsx
+|   |   |   |       
+|   |   |   +---prospective
+|   |   |   |       page.tsx
+|   |   |   |       
+|   |   |   \---view
+|   |   |           page.tsx
+|   |   |           
+|   |   \---societies
+|   |       |   page.tsx
+|   |       |   
+|   |       +---add
+|   |       |       page.tsx
+|   |       |       
+|   |       +---all
+|   |       |       page.tsx
+|   |       |       
+|   |       +---new
+|   |       |       page.tsx
+|   |       |       
+|   |       \---sessions
+|   |               page.tsx
+|   |               
+|   +---auth-resident
+|   |       page.tsx
+|   |       
+|   +---coach
+|   |   |   layout.tsx
+|   |   |   page.tsx
+|   |   |   
+|   |   +---attendance
+|   |   |       page.tsx
+|   |   |       
+|   |   +---login
+|   |   |       page.tsx
+|   |   |       
+|   |   \---sessions
+|   |           page.tsx
+|   |           
+|   +---enquiry
+|   |   +---coach
+|   |   |       page.tsx
+|   |   |       
+|   |   \---society
+|   |           page.tsx
+|   |           
+|   \---residents
+|       |   layout.tsx
+|       |   page.tsx
+|       |   
+|       +---booking-form
+|       |       page.tsx
+|       |       
+|       +---bookings
+|       |       page.tsx
+|       |       
+|       +---enquiry
+|       |       page.tsx
+|       |       
+|       +---notice
+|       |       page.tsx
+|       |       
+|       \---plans
+|               page.tsx
+|               
++---components
+|   +---about
+|   |       motive.tsx
+|   |       
+|   +---admin-ui
+|   |       AddCoach.tsx
+|   |       AddSociety.tsx
+|   |       AdminDashboard.tsx
+|   |       adminLogin.tsx
+|   |       AssignCoach.tsx
+|   |       Bookings.tsx
+|   |       CoachAttendance.tsx
+|   |       CoachFunctions.tsx
+|   |       CoachSchedule.tsx
+|   |       createSessions.tsx
+|   |       Enquiries.tsx
+|   |       ResidentManagement.tsx
+|   |       sendNotice.tsx
+|   |       SessionBooking.tsx
+|   |       SocietyManagement.tsx
+|   |       ViewCoaches.tsx
+|   |       ViewEnquiries.tsx
+|   |       ViewProspective.tsx
+|   |       ViewResidents.tsx
+|   |       ViewSessions.tsx
+|   |       ViewSocieties.tsx
+|   |       
+|   +---coach-ui
+|   |       Attendance.tsx
+|   |       CoachDashboard.tsx
+|   |       LoginUi.tsx
+|   |       Sessions.tsx
+|   |       
+|   +---landing page
+|   |       AddCoachEnquiry.tsx
+|   |       AddSocietyEnquiry.tsx
+|   |       EnquiryForm.tsx
+|   |       Footer.tsx
+|   |       HeroSection.tsx
+|   |       MissionSection.tsx
+|   |       Navbar.tsx
+|   |       StatsSection.tsx
+|   |       
+|   \---resident-ui
+|           BookingForm.tsx
+|           LoginSignup.tsx
+|           plans.tsx
+|           ResidentDashboard.tsx
+|           sendEnquiry.tsx
+|           viewBookings.tsx
+|           viewNotices.tsx
+|           
+\---utils
+    |   api.ts
+    |   
+    \---hooks
+            useProspectiveClients.tsx
+            

@@ -19,15 +19,16 @@ export default function EnquiryForm() {
 
         {/* Subheading */}
         <motion.p
-  initial={{ opacity: 0 }}
-  animate={{ opacity: 1 }}
-  transition={{ delay: 0.3, duration: 0.8 }}
-  className={`text-lg mb-8 text-gray-300 ${sourceSans.className}`}
->
-  Whether you&apos;re an <span className="text-blue-400 font-semibold">Individual</span>, a 
-  <span className="text-blue-400 font-semibold"> Coach</span>, or a 
-  <span className="text-blue-400 font-semibold"> Society</span> – send us your request and we&apos;ll reach out!
-</motion.p>
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.3, duration: 0.8 }}
+          className={`text-lg mb-8 text-gray-300 ${sourceSans.className}`}
+        >
+          Whether you&apos;re an <span className="text-blue-400 font-semibold">Individual</span>, a
+          <span className="text-blue-400 font-semibold"> Coach</span>, or a
+          <span className="text-blue-400 font-semibold"> Society</span>
+          <span className="text-blue-400 font-semibold">Dietician</span> – send us your request and we&apos;ll reach out!
+        </motion.p>
 
 
         {/* Form

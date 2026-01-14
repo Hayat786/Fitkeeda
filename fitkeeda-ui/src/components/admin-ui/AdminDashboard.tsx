@@ -143,6 +143,13 @@ export default function AdminDashboard() {
       gradient: "from-cyan-400 to-blue-600",
       action: () => router.push("/admin/booking"),
     },
+    {
+      title: "Add New Dietician",
+      icon: <MdPeople size={28} />,
+      caption: "Quickly onboard a new dietitian",
+      gradient: "from-purple-400 to-pink-500",
+      action: () => router.push("/admin/dieticians/new"),
+    },
   ];
 
   return (
@@ -193,11 +200,10 @@ export default function AdminDashboard() {
             onClick={
               stat.link !== "#" ? () => router.push(stat.link) : undefined
             }
-            className={`rounded-xl p-6 text-white bg-gradient-to-r ${stat.gradient} shadow-lg flex flex-col items-center justify-center ${
-              stat.link !== "#"
-                ? "cursor-pointer hover:shadow-2xl transition"
-                : ""
-            }`}
+            className={`rounded-xl p-6 text-white bg-gradient-to-r ${stat.gradient} shadow-lg flex flex-col items-center justify-center ${stat.link !== "#"
+              ? "cursor-pointer hover:shadow-2xl transition"
+              : ""
+              }`}
           >
             <p className="text-3xl font-bold">{stat.value}</p>
             <p className="text-sm opacity-80">{stat.label}</p>

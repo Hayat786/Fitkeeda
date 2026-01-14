@@ -178,7 +178,7 @@ export const deleteBooking = (id: string) => api.delete(`/bookings/${id}`);
 // 🔹 Base
 export interface BaseEnquiry {
   _id?: string;
-  type: "coach" | "society";
+  type: "coach" | "society" | "dietician";
   createdAt?: string;
   updatedAt?: string;
 }
@@ -202,8 +202,19 @@ export interface SocietyEnquiry extends BaseEnquiry {
   amenities?: string[];
 }
 
+// 🔹 Dietician Enquiry
+export interface DieticianEnquiry extends BaseEnquiry {
+  type: "dietician";
+  dieticianName: string;
+  dieticianPhone?: string;
+  dieticianEmail?: string;
+  dieticianLocation?: string;
+  dieticianSpecialization: string[];
+}
+
+
 // Union
-export type Enquiry = CoachEnquiry | SocietyEnquiry;
+export type Enquiry = CoachEnquiry | SocietyEnquiry | DieticianEnquiry;
 
 // 🔹 API calls
 export const createCoachEnquiry = (
@@ -213,6 +224,13 @@ export const createCoachEnquiry = (
 export const createSocietyEnquiry = (
   data: Omit<SocietyEnquiry, "_id" | "createdAt" | "updatedAt">
 ) => api.post<SocietyEnquiry>("/enquiries", { ...data, type: "society" });
+
+// Dieticians
+export const createDieticianEnquiry = (
+  data: Omit<DieticianEnquiry, "_id" | "createdAt" | "updatedAt">
+) => api.post<DieticianEnquiry>("/enquiries", { ...data, type: "dietician" });
+
+
 
 export const getAllEnquiries = () => api.get<Enquiry[]>("/enquiries");
 
@@ -261,6 +279,7 @@ export interface CustomerEnquiryData {
   createdAt?: string;
   updatedAt?: string;
 }
+/** 🔹 Dietician Enquiry ✅ */
 
 export interface AdminNoticeData {
   _id?: string;
@@ -282,6 +301,7 @@ export const createCustomerEnquiry = (
     ...data,
     type: "customer",
   });
+
 
 // 🔹 Create an admin notice
 export const createAdminNotice = (
@@ -322,11 +342,17 @@ export const loginCoach = (data: CoachAuthData) =>
 export const verifyCoachToken = (token: string) =>
   api.post("/coach-auth/verify", { token });
 
+/* ===================== Dietician Admin APIs ===================== */
+
+export const createDietician = (data: any) =>
+  api.post("/dieticians", data);
+
+export const registerDieticianAuth = (data: {
+  phone: string;
+  password: string;
+}) => api.post("/dietician-auth/register", data);
 
 // ===================== Attendance APIs =====================
-
-
-
 export interface AttendanceRecord {
   sessionId: string;
   coachId: string;
@@ -362,6 +388,9 @@ export const getTodayAttendance = (coachId: string) =>
 
 export const createOrder = (amount: number) =>
   api.post("/payments/create-order", { amount });
+
+
+
 
 
 export default api;

@@ -9,6 +9,7 @@ import {
   Enquiry,
   CoachEnquiry,
   SocietyEnquiry,
+  DieticianEnquiry,
 } from "@/utils/api";
 import { bebasNeue, sourceSans } from "@/fonts";
 import {
@@ -20,12 +21,14 @@ import {
   FaDumbbell,
   FaBuilding,
 } from "react-icons/fa";
+import { FaAppleAlt } from "react-icons/fa";
+
 
 export default function AdminEnquiries() {
   const router = useRouter();
   const [enquiries, setEnquiries] = useState<Enquiry[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-  const [activeTab, setActiveTab] = useState<"coach" | "society">("society"); // default societies
+  const [activeTab, setActiveTab] = useState<"coach" | "society" | "dietician">("society"); // default societies
 
   useEffect(() => {
     let mounted = true;
@@ -47,6 +50,8 @@ export default function AdminEnquiries() {
 
   const coachEnquiries = enquiries.filter((e) => e.type === "coach") as CoachEnquiry[];
   const societyEnquiries = enquiries.filter((e) => e.type === "society") as SocietyEnquiry[];
+  const dieticianEnquiries = enquiries.filter((e) => e.type === "dietician") as DieticianEnquiry[];
+
 
   return (
     <motion.div
@@ -89,41 +94,48 @@ export default function AdminEnquiries() {
       ) : (
         <>
           {/* Stats section - larger & full width */}
-<div className="w-full max-w-5xl mx-auto mb-12 grid grid-cols-1 sm:grid-cols-2 gap-6 text-center">
-  <div className="p-6 bg-white rounded-xl shadow-md">
-    <p className="text-lg text-gray-600">Coach Enquiries</p>
-    <p className="text-5xl font-extrabold text-green-600">
-      {coachEnquiries.length}
-    </p>
-  </div>
-  <div className="p-6 bg-white rounded-xl shadow-md">
-    <p className="text-lg text-gray-600">Society Enquiries</p>
-    <p className="text-5xl font-extrabold text-blue-600">
-      {societyEnquiries.length}
-    </p>
-  </div>
-</div>
+          <div className="w-full max-w-5xl mx-auto mb-12 grid grid-cols-1 sm:grid-cols-2 gap-6 text-center">
+            <div className="p-6 bg-white rounded-xl shadow-md">
+              <p className="text-lg text-gray-600">Coach Enquiries</p>
+              <p className="text-5xl font-extrabold text-green-600">
+                {coachEnquiries.length}
+              </p>
+            </div>
+            <div className="p-6 bg-white rounded-xl shadow-md">
+              <p className="text-lg text-gray-600">Society Enquiries</p>
+              <p className="text-5xl font-extrabold text-blue-600">
+                {societyEnquiries.length}
+              </p>
+            </div>
+          </div>
+
+          <div className="w-full max-w-5xl mx-auto mb-12 grid grid-cols-1 sm:grid-cols-2 gap-6 text-center">
+            <div className="p-6 bg-white rounded-xl shadow-md">
+              <p className="text-lg text-gray-600">Dietician Enquiries</p>
+              <p className="text-5xl font-extrabold text-green-600">
+                {dieticianEnquiries.length}
+              </p>
+            </div>
+          </div>
 
 
           {/* Tab bar */}
           <div className="flex justify-center gap-12 border-b border-gray-200 mb-8 relative">
-            {["society", "coach"].map((tab) => (
+            {["society", "coach", "dietician"].map((tab) => (
               <button
                 key={tab}
-                onClick={() => setActiveTab(tab as "coach" | "society")}
-                className={`pb-2 text-lg font-medium transition ${
-                  activeTab === tab
-                    ? "text-gray-900"
-                    : "text-gray-500 hover:text-gray-700"
-                }`}
+                onClick={() => setActiveTab(tab as "coach" | "society" | "dietician")}
+                className={`pb-2 text-lg font-medium transition ${activeTab === tab
+                  ? "text-gray-900"
+                  : "text-gray-500 hover:text-gray-700"
+                  }`}
               >
-                {tab === "coach" ? "Coaches" : "Societies"}
+                {tab === "coach" ? "Coaches" : tab === "society" ? "Societies" : "Dieticians"}
                 {activeTab === tab && (
                   <motion.div
                     layoutId="underline"
-                    className={`h-0.5 rounded-full ${
-                      tab === "coach" ? "bg-green-500" : "bg-blue-500"
-                    }`}
+                    className={`h-0.5 rounded-full ${tab === "coach" ? "bg-green-500" : "bg-blue-500"
+                      }`}
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ duration: 0.3 }}
@@ -169,19 +181,19 @@ export default function AdminEnquiries() {
                         <FaMapMarkerAlt className="text-gray-400" /> {c.location || "N/A"}
                       </p>
                       {c.sportsSpecialized.length > 0 && (
-    <div className="mt-3">
-      <p className="text-base font-semibold text-gray-700 mb-1 flex items-center gap-2">
-        <FaDumbbell className="text-gray-500" /> Sports Specialized:
-      </p>
-      <ul className="list-disc list-inside text-gray-600 space-y-1 ml-6">
-        {c.sportsSpecialized.map((sport, idx) => (
-          <li key={idx} className="flex items-center gap-2">
-            <span className="text-green-500">•</span> {sport}
-          </li>
-        ))}
-      </ul>
-    </div>
-  )}
+                        <div className="mt-3">
+                          <p className="text-base font-semibold text-gray-700 mb-1 flex items-center gap-2">
+                            <FaDumbbell className="text-gray-500" /> Sports Specialized:
+                          </p>
+                          <ul className="list-disc list-inside text-gray-600 space-y-1 ml-6">
+                            {c.sportsSpecialized.map((sport, idx) => (
+                              <li key={idx} className="flex items-center gap-2">
+                                <span className="text-green-500">•</span> {sport}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
                     </motion.div>
                   ))
                 )}
@@ -219,19 +231,70 @@ export default function AdminEnquiries() {
                         <FaMapMarkerAlt className="text-gray-400" /> {s.location || "N/A"}
                       </p>
                       {s.amenities && s.amenities.length > 0 && (
-    <div className="mt-3">
-      <p className="text-base font-semibold text-gray-700 mb-1 flex items-center gap-2">
-        <FaBuilding className="text-gray-500" /> Amenities:
-      </p>
-      <ul className="list-disc list-inside text-gray-600 space-y-1 ml-6">
-        {s.amenities.map((amenity, idx) => (
-          <li key={idx} className="flex items-center gap-2">
-            <span className="text-blue-500">•</span> {amenity}
-          </li>
-        ))}
-      </ul>
-    </div>
-  )}
+                        <div className="mt-3">
+                          <p className="text-base font-semibold text-gray-700 mb-1 flex items-center gap-2">
+                            <FaBuilding className="text-gray-500" /> Amenities:
+                          </p>
+                          <ul className="list-disc list-inside text-gray-600 space-y-1 ml-6">
+                            {s.amenities.map((amenity, idx) => (
+                              <li key={idx} className="flex items-center gap-2">
+                                <span className="text-blue-500">•</span> {amenity}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                    </motion.div>
+                  ))
+                )}
+              </motion.div>
+            )}
+            {activeTab === "dietician" && (
+              <motion.div
+                key="dietician-list"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.4 }}
+                className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {dieticianEnquiries.length === 0 ? (
+                  <p className="col-span-full text-center text-gray-600">
+                    No dietician enquiries found.
+                  </p>
+                ) : (
+                  dieticianEnquiries.map((d) => (
+                    <motion.div
+                      key={d._id}
+                      whileHover={{ scale: 1.02 }}
+                      className="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden p-5"
+                    >
+                      <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
+                        <FaAppleAlt className="text-purple-500" />
+                        {d.dieticianName}
+                      </h3>
+
+                      <p className="text-sm text-gray-600 flex items-center gap-2 mt-2">
+                        <FaPhone /> {d.dieticianPhone || "N/A"}
+                      </p>
+                      <p className="text-sm text-gray-600 flex items-center gap-2 mt-2">
+                        <FaEnvelope /> {d.dieticianEmail || "N/A"}
+                      </p>
+                      <p className="text-sm text-gray-600 flex items-center gap-2 mt-2">
+                        <FaMapMarkerAlt /> {d.dieticianLocation || "N/A"}
+                      </p>
+
+                      {d.dieticianSpecialization?.length > 0 && (
+                        <div className="mt-3">
+                          <p className="text-base font-semibold text-gray-700 flex items-center gap-2">
+                            <FaAppleAlt /> Specialization:
+                          </p>
+                          <ul className="list-disc list-inside ml-6 text-gray-600">
+                            {d.dieticianSpecialization.map((s, i) => (
+                              <li key={i}>{s}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
                     </motion.div>
                   ))
                 )}

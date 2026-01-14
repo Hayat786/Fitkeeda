@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { barlow, sourceSans } from "@/fonts";
 import Image from "next/image";
 import { FaDumbbell, FaUserPlus, FaBuilding } from "react-icons/fa";
+import { BiFoodMenu, BiFoodTag } from "react-icons/bi";
 
 export default function HeroSection() {
   return (
@@ -31,7 +32,7 @@ export default function HeroSection() {
 
       {/* Content */}
       <div className="relative z-10 flex flex-col md:flex-row items-center justify-between px-6 md:px-16 max-w-7xl mx-auto pt-16 md:pt-24 pb-12 gap-10">
-        
+
         {/* Left Side - Logo + Tagline */}
         <motion.div
           initial={{ x: -60, opacity: 0 }}
@@ -72,6 +73,7 @@ export default function HeroSection() {
             { label: "Resident Login", link: "/auth-resident", icon: <FaDumbbell className="text-xl" /> },
             { label: "Enroll as Coach", link: "/enquiry/coach", icon: <FaUserPlus className="text-xl" /> },
             { label: "Society Registration", link: "/enquiry/society", icon: <FaBuilding className="text-xl" /> },
+            { label: "Dietician Registration", link: "/enquiry/dietician", icon: <BiFoodTag className="text-xl" /> },
           ].map((btn, i) => (
             <motion.a
               key={i}
