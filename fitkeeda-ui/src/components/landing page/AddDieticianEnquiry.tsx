@@ -133,7 +133,7 @@ export default function DieticianEnquiryForm() {
                         <div>
                             <h3 className="text-2xl font-bold text-blue-900">S M Hayat</h3>
                             <span className="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full font-bold mt-1">
-                                Weight Loss Expert
+                                Weight Management Specialist
                             </span>
                         </div>
                         <div className="text-right">
